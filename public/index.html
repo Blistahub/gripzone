@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRIPZONE - Strength Data</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121212'/%3E%3Ctext x='5' y='52' font-family='Teko, Impact, sans-serif' font-weight='700' font-size='50' fill='white'%3EG%3C/text%3E%3Ctext x='32' y='52' font-family='Teko, Impact, sans-serif' font-weight='700' font-size='50' fill='%23F4C430'%3EZ%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo sweep-hover">GRIP<span class="highlight">ZONE</span></a>
+
+        <div class="nav-tools">
+            <div class="lang-wrapper sweep-hover-btn">
+                <select id="langSelect">
+                    <option value="es">ES</option>
+                    <option value="en">EN</option>
+                    <option value="ru">RU</option>
+                    <option value="cn">CN</option>
+                </select>
+                <i class="fas fa-chevron-down lang-arrow"></i>
+            </div>
+
+            <button id="loginBtn" class="btn btn-outline sweep-hover-btn" data-i18n="login">Iniciar Sesión</button>
+
+            <div id="userInfo" class="user-info hidden">
+                <span id="userNameDisplay" class="nav-user-link hover-slide">Usuario</span>
+                <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
+                <button id="uploadBtn" class="btn btn-primary sweep-hover-btn" data-i18n="upload">Nueva Marca</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- VISTA 1: RANKING GLOBAL -->
+    <section id="global-ranking-view">
+        <header class="hero">
+            <div class="hero-content">
+                <h1 data-i18n="hero_title">GRIP<span class="highlight">ZONE</span> RANKING</h1>
+                <p data-i18n="hero_subtitle">BASE DE DATOS MUNDIAL DE FUERZA DE MANO</p>
+            </div>
+        </header>
+
+        <section class="controls">
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="sort_by">Ordenar por:</span>
+                <button class="filter-btn sweep-hover-btn" data-sort="score"><span data-i18n="btn_score">Marca</span> <i
+                        class="fas fa-sort"></i></button>
+                <button class="filter-btn sweep-hover-btn" data-sort="bw"><span data-i18n="btn_bw">Peso Corp.</span> <i
+                        class="fas fa-sort"></i></button>
+                <button class="filter-btn sweep-hover-btn" data-sort="date"><span data-i18n="btn_date">Fecha</span> <i
+                        class="fas fa-sort"></i></button>
+                <button class="filter-btn sweep-hover-btn" data-sort="country"><span data-i18n="btn_country">País</span>
+                    <i class="fas fa-sort"></i></button>
+            </div>
+        </section>
+
+        <main class="ranking-wrapper">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th class="th-rank">#</th>
+                        <th data-i18n="th_athlete">Atleta</th>
+                        <th data-i18n="th_country">País</th>
+                        <th data-i18n="th_device">Dispositivo</th>
+                        <th data-i18n="th_score" class="text-right">Marca</th>
+                        <th data-i18n="th_bw" class="text-right">Peso</th>
+                        <th data-i18n="th_date" class="text-right">Fecha</th>
+                        <th data-i18n="th_video" class="text-center">Video</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingBody"></tbody>
+            </table>
+        </main>
+    </section>
+
+    <!-- VISTA 2: PERFIL DE USUARIO -->
+    <section id="profile-view" class="hidden">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-img-col">
+                    <img id="profile-avatar" src="" alt="Avatar" class="profile-avatar-img">
+                </div>
+
+                <div class="profile-info-col">
+                    <h1 id="profile-name" class="profile-name">NOMBRE ATLETA</h1>
+                    <div class="profile-meta">
+                        <span id="profile-bio" class="profile-role">Descripción...</span>
+                    </div>
+
+                    <div class="profile-stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="lbl_country">PAÍS</span>
+                            <span id="profile-country" class="stat-value text-accent">ES</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="lbl_best_score">MEJOR MARCA</span>
+                            <span id="profile-best" class="stat-value text-accent">00.0</span> <small>kg</small>
+                        </div>
+                        <div class="stat-item">
+                            <!-- NUEVO CAMPO: PESO -->
+                            <span class="stat-label" data-i18n="lbl_current_bw">PESO</span>
+                            <span id="profile-bw-display" class="stat-value text-accent">00.0</span> <small>kg</small>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="lbl_rank_global">RANK GLOBAL</span>
+                            <span id="profile-rank-badge" class="rank-badge">#0</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-socials">
+                        <a id="link-insta" href="#" target="_blank" class="social-btn sweep-hover-btn"><i
+                                class="fab fa-instagram"></i> INSTAGRAM</a>
+                        <a id="link-yt" href="#" target="_blank" class="social-btn sweep-hover-btn"><i
+                                class="fab fa-youtube"></i> YOUTUBE</a>
+                        <!-- Botón con traducción y efecto hover -->
+                        <button id="editProfileBtn" class="btn btn-outline hidden sweep-hover-btn"
+                            style="margin-left:auto; border-color:white; color:white"
+                            data-i18n="btn_edit_profile">EDITAR PERFIL</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="personal-history">
+                <h3 class="history-title" data-i18n="title_history">HISTORIAL DE AGARRE</h3>
+                <table class="ranking-table personal-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_date">FECHA</th>
+                            <th data-i18n="th_device">DISPOSITIVO</th>
+                            <th class="text-right" data-i18n="th_score">MARCA</th>
+                            <th class="text-right" data-i18n="th_bw">PESO CORP.</th>
+                            <th class="text-center" data-i18n="th_video">VIDEO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="personalHistoryBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Botón volver con traducción y efecto hover -->
+            <button onclick="goHome()" class="btn btn-outline sweep-hover-btn" style="margin-top:20px;"
+                data-i18n="btn_back_ranking">&larr; VOLVER AL RANKING</button>
+        </div>
+    </section>
+
+    <!-- MODAL: LOGIN / REGISTRO -->
+    <div id="authModal" class="modal-backdrop hidden">
+        <div class="modal">
+            <button class="close-modal">&times;</button>
+            <div class="tabs">
+                <button class="tab active" data-tab="login-form" data-i18n="tab_login">Entrar</button>
+                <button class="tab" data-tab="register-form" data-i18n="tab_register">Registrarse</button>
+            </div>
+            <form id="login-form" class="auth-form active">
+                <input type="email" id="loginEmail" data-i18n-ph="ph_email" placeholder="Email" required>
+                <input type="password" id="loginPass" data-i18n-ph="ph_pass" placeholder="Contraseña" required>
+                <button type="submit" class="btn btn-primary full-width sweep-hover-btn"
+                    data-i18n="btn_enter">Entrar</button>
+            </form>
+            <form id="register-form" class="auth-form hidden">
+                <input type="text" id="regName" data-i18n-ph="ph_name" placeholder="Nombre y Apellidos" required>
+                <input type="text" id="regCountry" data-i18n-ph="ph_country" placeholder="País (Código ES, US...)"
+                    maxlength="2" style="text-transform:uppercase" required>
+                <input type="email" id="regEmail" data-i18n-ph="ph_email" placeholder="Email" required>
+                <input type="password" id="regPass" data-i18n-ph="ph_pass" placeholder="Contraseña" required>
+                <button type="submit" class="btn btn-primary full-width sweep-hover-btn" data-i18n="btn_register">Crear
+                    Cuenta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SUBIR MARCA -->
+    <div id="uploadModal" class="modal-backdrop hidden">
+        <div class="modal">
+            <button class="close-modal">&times;</button>
+            <h2 class="modal-title" data-i18n="upload_header">Registrar Marca</h2>
+            <form id="upload-form">
+                <label data-i18n="lbl_device">Dinamómetro</label>
+                <select id="upDevice">
+                    <option value="GM150">GM150</option>
+                    <option value="Camry">Camry</option>
+                    <option value="Baseline">Baseline</option>
+                </select>
+                <label data-i18n="lbl_score">Marca (KG)</label>
+                <input type="number" id="upScore" step="0.01" required>
+                <label data-i18n="lbl_bw">Peso Corporal (KG)</label>
+                <input type="number" id="upBw" step="0.1" required>
+                <label data-i18n="lbl_video">YouTube Link</label>
+                <input type="url" id="upVideo" data-i18n-ph="ph_video" placeholder="https://...">
+                <button type="submit" class="btn btn-primary full-width sweep-hover-btn"
+                    data-i18n="btn_submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR PERFIL -->
+    <div id="editProfileModal" class="modal-backdrop hidden">
+        <div class="modal">
+            <button class="close-modal">&times;</button>
+            <h2 class="modal-title" data-i18n="modal_edit_title">EDITAR PERFIL</h2>
+            <form id="edit-profile-form">
+                <label data-i18n="lbl_edit_photo">Foto de Perfil</label>
+                <input type="file" id="editAvatar" accept="image/*"
+                    style="padding:5px; border:1px solid #333; width:100%; margin-bottom:15px; background:#111">
+
+                <label data-i18n="lbl_edit_bw">Peso Corporal (KG)</label>
+                <input type="number" id="editBwInput" step="0.1" required>
+
+                <label data-i18n="lbl_edit_bio">Descripción / Bio</label>
+                <input type="text" id="editBio" data-i18n-ph="ph_bio" placeholder="Armwrestler, Climber...">
+
+                <label>Instagram Link</label>
+                <input type="url" id="editInsta" placeholder="https://instagram.com/...">
+
+                <label>YouTube Link</label>
+                <input type="url" id="editYt" placeholder="https://youtube.com/...">
+
+                <button type="submit" class="btn btn-primary full-width sweep-hover-btn"
+                    data-i18n="btn_save_changes">GUARDAR CAMBIOS</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
