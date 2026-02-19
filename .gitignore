@@ -1,3 +1,7 @@
 node_modules
-database.json
+database.json       <-- (Si no lo borraste, para que no se suba)
+gripzone.db         <-- LA NUEVA BASE DE DATOS (No subir nunca)
+gripzone.db-journal <-- Archivo temporal de SQLite
+public/uploads/*    <-- Las fotos de la gente (No subir)
+!public/uploads/.gitkeep <-- Truco para mantener la carpeta pero vacía
 .DS_Store

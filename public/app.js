@@ -4,6 +4,7 @@ let records = [];
 let currentUser = JSON.parse(localStorage.getItem('gripzone_user')) || null;
 let currentProfileEmail = null;
 let sortState = { key: 'score', order: 'desc' };
+let myChart = null;
 
 const translations = {
     es: {
@@ -16,7 +17,6 @@ const translations = {
         upload_header: "Registrar Marca", lbl_device: "Dinamómetro", lbl_score: "Marca (KG)", lbl_bw: "Peso (KG)", lbl_video: "Video Link", btn_submit: "Guardar",
         ph_email: "Correo Electrónico", ph_pass: "Contraseña", ph_name: "Nombre y Apellidos", ph_country: "País (Código ISO: ES, MX...)",
         ph_video: "Enlace de Youtube (Opcional)",
-        // NUEVAS TRADUCCIONES PERFIL
         lbl_country: "PAÍS", lbl_best_score: "MEJOR MARCA", lbl_current_bw: "PESO", lbl_rank_global: "RANK GLOBAL",
         btn_edit_profile: "EDITAR PERFIL", btn_back_ranking: "VOLVER AL RANKING", title_history: "HISTORIAL DE AGARRE",
         modal_edit_title: "EDITAR PERFIL", lbl_edit_photo: "Foto de Perfil", lbl_edit_bw: "Peso Corporal (KG)", lbl_edit_bio: "Descripción / Bio",
@@ -32,7 +32,6 @@ const translations = {
         upload_header: "New Record", lbl_device: "Dynamometer", lbl_score: "Score (KG)", lbl_bw: "BW (KG)", lbl_video: "Video Link", btn_submit: "Save",
         ph_email: "Email Address", ph_pass: "Password", ph_name: "Full Name", ph_country: "Country Code (US, UK...)",
         ph_video: "YouTube Link (Optional)",
-        // NEW PROFILE TRANSLATIONS
         lbl_country: "COUNTRY", lbl_best_score: "BEST SCORE", lbl_current_bw: "WEIGHT", lbl_rank_global: "GLOBAL RANK",
         btn_edit_profile: "EDIT PROFILE", btn_back_ranking: "BACK TO RANKING", title_history: "GRIP HISTORY",
         modal_edit_title: "EDIT PROFILE", lbl_edit_photo: "Profile Photo", lbl_edit_bw: "Body Weight (KG)", lbl_edit_bio: "Description / Bio",
@@ -48,7 +47,6 @@ const translations = {
         upload_header: "Новый рекорд", lbl_device: "Динамометр", lbl_score: "Результат (КГ)", lbl_bw: "Вес (КГ)", lbl_video: "Ссылка на видео", btn_submit: "Сохранить",
         ph_email: "Электронная почта", ph_pass: "Пароль", ph_name: "Полное имя", ph_country: "Код страны (RU, KZ...)",
         ph_video: "Ссылка на YouTube (Необязательно)",
-        // NEW PROFILE TRANSLATIONS
         lbl_country: "СТРАНА", lbl_best_score: "ЛУЧШИЙ", lbl_current_bw: "ВЕС ТЕЛА", lbl_rank_global: "РЕЙТИНГ",
         btn_edit_profile: "РЕДАКТИРОВАТЬ", btn_back_ranking: "НАЗАД В РЕЙТИНГ", title_history: "ИСТОРИЯ",
         modal_edit_title: "РЕДАКТИРОВАТЬ", lbl_edit_photo: "Фото профиля", lbl_edit_bw: "Вес тела (КГ)", lbl_edit_bio: "Описание",
@@ -64,7 +62,6 @@ const translations = {
         upload_header: "新记录", lbl_device: "测力计", lbl_score: "分数 (KG)", lbl_bw: "体重 (KG)", lbl_video: "视频链接", btn_submit: "提交",
         ph_email: "电子邮件", ph_pass: "密码", ph_name: "全名", ph_country: "国家代码 (CN, JP...)",
         ph_video: "YouTube 链接 (可选)",
-        // NEW PROFILE TRANSLATIONS
         lbl_country: "国家", lbl_best_score: "最佳成绩", lbl_current_bw: "体重", lbl_rank_global: "全球排名",
         btn_edit_profile: "编辑资料", btn_back_ranking: "返回排名", title_history: "历史记录",
         modal_edit_title: "编辑资料", lbl_edit_photo: "头像", lbl_edit_bw: "体重 (KG)", lbl_edit_bio: "简介",
@@ -93,15 +90,21 @@ async function loadProfile(email) {
         const res = await fetch(`${API_URL}/get-profile`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
         });
+
+        if (!res.ok) throw new Error('Error en servidor');
         const data = await res.json();
+
+        // SEGURIDAD
+        const safeBW = data.bw || 0;
+        const safeBestScore = data.bestScore || 0;
 
         // UI Fill
         document.getElementById('profile-name').textContent = data.name;
         document.getElementById('profile-country').innerHTML = `<img src="https://flagcdn.com/${data.country.toLowerCase()}.svg" class="flag-icon"> ${data.country}`;
         document.getElementById('profile-bio').textContent = data.bio;
-        document.getElementById('profile-best').textContent = data.bestScore.toFixed(2);
+        document.getElementById('profile-best').textContent = safeBestScore.toFixed(2);
         document.getElementById('profile-rank-badge').textContent = data.globalRank === '-' ? '-' : '#' + data.globalRank;
-        document.getElementById('profile-bw-display').textContent = data.bw.toFixed(1); // MOSTRAR PESO
+        document.getElementById('profile-bw-display').textContent = safeBW.toFixed(1);
 
         const avatarImg = document.getElementById('profile-avatar');
         avatarImg.src = data.avatar ? data.avatar : 'https://via.placeholder.com/300x400/111/444?text=NO+IMAGE';
@@ -118,16 +121,18 @@ async function loadProfile(email) {
         const editBtn = document.getElementById('editProfileBtn');
         if (currentUser && currentUser.email === email) {
             editBtn.classList.remove('hidden');
-            // Pre-rellenar formulario
-            document.getElementById('editBio').value = data.bio;
-            document.getElementById('editInsta').value = data.instagram;
-            document.getElementById('editYt').value = data.youtube;
-            document.getElementById('editBwInput').value = data.bw; // Pre-rellenar peso
+            document.getElementById('editBio').value = data.bio || '';
+            document.getElementById('editInsta').value = data.instagram || '';
+            document.getElementById('editYt').value = data.youtube || '';
+            document.getElementById('editBwInput').value = safeBW;
         } else {
             editBtn.classList.add('hidden');
         }
 
-        renderPersonalTable(data.history);
+        renderBadges(safeBestScore, safeBW, data.history || []);
+        renderChart(data.history || []);
+        renderPersonalTable(data.history || []);
+
         document.getElementById('global-ranking-view').classList.add('hidden');
         document.getElementById('profile-view').classList.remove('hidden');
         window.scrollTo(0, 0);
@@ -137,20 +142,106 @@ async function loadProfile(email) {
     }
 }
 
+// --- RENDER BADGES (ADVANCED) ---
+function renderBadges(bestScore, bw, history) {
+    const container = document.getElementById('badges-container');
+    container.innerHTML = '';
+
+    const badges = [];
+
+    // 1. FUERZA ABSOLUTA
+    if (bestScore > 0) {
+        if (bestScore >= 120) { badges.push({ icon: 'fa-khanda', text: '120KG+ HYDRAULIC', class: 'mythic' }); }
+        else if (bestScore >= 110) { badges.push({ icon: 'fa-dumbbell', text: '110KG TITAN', class: 'mythic' }); }
+        else if (bestScore >= 100) { badges.push({ icon: 'fa-certificate', text: '100KG CENTURY CLUB', class: 'diamond' }); }
+        else if (bestScore >= 90) { badges.push({ icon: 'fa-dragon', text: '90KG BEAST', class: 'diamond' }); }
+        else if (bestScore >= 80) { badges.push({ icon: 'fa-fist-raised', text: '80KG VICE GRIP', class: 'gold' }); }
+        else if (bestScore >= 70) { badges.push({ icon: 'fa-hand-rock', text: '70KG IRON HAND', class: 'gold' }); }
+        else if (bestScore >= 60) { badges.push({ icon: 'fa-lock', text: '60KG LOCKED', class: 'silver' }); }
+        else if (bestScore >= 50) { badges.push({ icon: 'fa-user', text: '50KG AVERAGE JOE', class: 'bronze' }); }
+        else if (bestScore >= 40) { badges.push({ icon: 'fa-seedling', text: '40KG ROOKIE', class: 'bronze' }); }
+        else { badges.push({ icon: 'fa-baby', text: 'BABY GRIP', class: 'trash' }); }
+    }
+
+    // 2. FUERZA RELATIVA
+    if (bw > 0 && bestScore > 0) {
+        const ratio = bestScore / bw;
+        if (ratio >= 2.0) { badges.push({ icon: 'fa-spider', text: 'THE SPIDER (2.0x)', class: 'mythic' }); }
+        else if (ratio >= 1.8) { badges.push({ icon: 'fa-pastafarianism', text: 'THE CRAB (1.8x)', class: 'diamond' }); }
+        else if (ratio >= 1.5) { badges.push({ icon: 'fa-bug', text: 'THE ANT (1.5x)', class: 'gold' }); }
+        else if (ratio >= 1.2) { badges.push({ icon: 'fa-cat', text: 'POUND 4 POUND (1.2x)', class: 'silver' }); }
+        else if (ratio >= 1.0) { badges.push({ icon: 'fa-balance-scale', text: 'BALANCED (1.0x)', class: 'bronze' }); }
+    }
+
+    // 3. FIDELIDAD
+    if (history.length > 0) { badges.push({ icon: 'fa-flag-checkered', text: 'DEBUT', class: 'silver' }); }
+    if (history.length >= 10) { badges.push({ icon: 'fa-medal', text: 'VETERAN', class: 'gold' }); }
+    else if (history.length >= 5) { badges.push({ icon: 'fa-star', text: 'CONSISTENT', class: 'bronze' }); }
+
+    badges.forEach(b => {
+        const div = document.createElement('div');
+        div.className = `badge ${b.class}`;
+        div.innerHTML = `<i class="fas ${b.icon}"></i> ${b.text}`;
+        div.title = b.text;
+        container.appendChild(div);
+    });
+}
+
+// --- RENDER CHART ---
+function renderChart(history) {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const chartData = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (chartData.length === 0) chartData.push({ date: 'Start', score: 0 });
+
+    const labels = chartData.map(d => d.date);
+    const dataPoints = chartData.map(d => d.score);
+
+    if (myChart) myChart.destroy();
+
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Fuerza (KG)',
+                data: dataPoints,
+                borderColor: '#F4C430',
+                backgroundColor: 'rgba(244, 196, 48, 0.1)',
+                borderWidth: 2,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#F4C430',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.9)', titleColor: '#F4C430', bodyColor: '#fff', borderColor: '#333', borderWidth: 1 } },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' }, beginAtZero: false }
+            }
+        }
+    });
+}
+
 function renderPersonalTable(history) {
     const tbody = document.getElementById('personalHistoryBody');
     tbody.innerHTML = '';
-    history.sort((a, b) => b.id - a.id);
+    const safeHistory = [...history];
+    safeHistory.sort((a, b) => b.id - a.id);
 
-    history.forEach(r => {
+    safeHistory.forEach(r => {
         let videoContent = (r.video && r.video.trim() !== '') ? `<a href="${r.video}" target="_blank" class="video-link"><i class="fas fa-play-circle fa-lg"></i></a>` : `<span style="color:#333">-</span>`;
-
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="color:var(--text-muted)">${r.date}</td>
             <td style="color:var(--text-main)">${r.device}</td>
-            <td class="text-right"><span class="score-val" style="font-size:1.3rem">${r.score.toFixed(2)}</span> kg</td>
-            <td class="text-right">${r.bw} kg</td>
+            <td class="text-right"><span class="score-val" style="font-size:1.3rem">${parseFloat(r.score).toFixed(2)}</span> kg</td>
+            <td class="text-right">${parseFloat(r.bw).toFixed(1)} kg</td>
             <td class="text-center">${videoContent}</td>
         `;
         tbody.appendChild(tr);
@@ -158,25 +249,16 @@ function renderPersonalTable(history) {
 }
 
 // --- UTILS & API ---
-const getBase64 = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-});
-
 async function updateProfile(data) {
-    const res = await fetch(`${API_URL}/profile/update`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
-    });
+    const res = await fetch(`${API_URL}/profile/update`, { method: 'POST', body: data });
     return res.json();
 }
 async function fetchRecords() {
-    const res = await fetch(`${API_URL}/records`);
-    records = await res.json();
-    applySort();
+    try {
+        const res = await fetch(`${API_URL}/records`);
+        if (res.ok) { records = await res.json(); applySort(); }
+    } catch (e) { console.error("Server offline?"); }
 }
-// ... (Funciones de registro/login/upload se mantienen igual)
 async function registerUser(data) {
     const res = await fetch(`${API_URL}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     return res.json();
@@ -209,8 +291,8 @@ function renderTable() {
             </td>
             <td><img src="https://flagcdn.com/${r.country.toLowerCase()}.svg" class="flag-icon"> ${r.country}</td>
             <td><span class="device-tag">${r.device}</span></td>
-            <td class="text-right"><span class="score-val">${r.score.toFixed(2)}</span><span class="unit-small">kg</span>${newPrBadge}</td>
-            <td class="text-right text-muted">${r.bw}<span class="unit-small">kg</span></td>
+            <td class="text-right"><span class="score-val">${parseFloat(r.score).toFixed(2)}</span><span class="unit-small">kg</span>${newPrBadge}</td>
+            <td class="text-right text-muted">${parseFloat(r.bw).toFixed(1)}<span class="unit-small">kg</span></td>
             <td class="text-right text-muted" style="font-size:0.9rem">${r.date}</td>
             <td class="text-center">${videoContent}</td>
         `;
@@ -271,25 +353,27 @@ function setupEventListeners() {
     // EDIT PROFILE SUBMIT
     document.getElementById('edit-profile-form').onsubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('email', currentUser.email);
+        formData.append('bio', document.getElementById('editBio').value);
+        formData.append('instagram', document.getElementById('editInsta').value);
+        formData.append('youtube', document.getElementById('editYt').value);
+        formData.append('bw', document.getElementById('editBwInput').value);
+
         const fileInput = document.getElementById('editAvatar');
-        let avatarBase64 = null;
         if (fileInput.files.length > 0) {
-            avatarBase64 = await getBase64(fileInput.files[0]);
+            formData.append('avatar', fileInput.files[0]);
         }
-        const res = await updateProfile({
-            email: currentUser.email,
-            bio: document.getElementById('editBio').value,
-            instagram: document.getElementById('editInsta').value,
-            youtube: document.getElementById('editYt').value,
-            bw: document.getElementById('editBwInput').value, // ENVIAR PESO
-            avatar: avatarBase64
-        });
-        if (res.success) {
-            editProfileModal.classList.add('hidden');
-            loadProfile(currentUser.email);
-        } else {
-            alert('Error actualizando perfil');
-        }
+
+        try {
+            const res = await updateProfile(formData);
+            if (res.success) {
+                editProfileModal.classList.add('hidden');
+                loadProfile(currentUser.email);
+            } else {
+                alert('Error actualizando perfil');
+            }
+        } catch (err) { console.error(err); }
     };
 
     document.getElementById('login-form').onsubmit = async (e) => {

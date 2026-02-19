@@ -1,165 +1,154 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const db = require('./database');
 
 const app = express();
 const PORT = 3000;
-const DB_FILE = 'database.json';
+const SECRET_KEY = 'gripzone_secret_key';
 
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(cors());
-app.use(express.static('public'));
-
-const readDB = () => {
-    if (!fs.existsSync(DB_FILE)) {
-        const initialData = { users: [], records: [] };
-        fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
-        return initialData;
+// Configuración Multer (Imágenes)
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = './public/uploads';
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
     }
-    const db = JSON.parse(fs.readFileSync(DB_FILE));
-    db.users.forEach(u => { if (!u.history) u.history = []; });
-    // Migración de records antiguos a historial (Código anterior mantenido)
-    db.records.forEach(record => {
-        const user = db.users.find(u => u.email === record.email);
-        if (user) {
-            const existsInHistory = user.history.some(h => (h.date === record.date && h.score === record.score) || (h.id === record.id));
-            if (!existsInHistory) {
-                user.history.push({
-                    id: record.id || Date.now(),
-                    date: record.date, device: record.device, score: record.score, bw: record.bw, video: record.video
-                });
-            }
-        }
-    });
-    return db;
-};
+});
+const upload = multer({ storage: storage });
 
-const writeDB = (data) => {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-};
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
 // --- API ENDPOINTS ---
 
-app.get('/api/records', (req, res) => {
-    const db = readDB();
-    const sortedRecords = db.records.sort((a, b) => b.score - a.score);
-    res.json(sortedRecords);
+// 1. Registro
+app.post('/api/register', async (req, res) => {
+    const { email, password, name, country } = req.body;
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const sql = `INSERT INTO users (email, password, name, country) VALUES (?, ?, ?, ?)`;
+        db.run(sql, [email, hashedPassword, name, country], function (err) {
+            if (err) return res.status(400).json({ error: 'El email ya existe' });
+            const token = jwt.sign({ id: this.lastID, email }, SECRET_KEY);
+            res.json({ success: true, token, user: { id: this.lastID, name, country, email } });
+        });
+    } catch (e) { res.status(500).json({ error: 'Error servidor' }); }
 });
 
-app.post('/api/get-profile', (req, res) => {
-    const { email } = req.body;
-    const db = readDB();
-
-    const user = db.users.find(u => u.email === email);
-    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
-
-    const sortedRecords = db.records.sort((a, b) => b.score - a.score);
-    const globalRank = sortedRecords.findIndex(r => r.email === email) + 1;
-    const bestRecord = sortedRecords.find(r => r.email === email);
-
-    res.json({
-        name: user.name,
-        country: user.country,
-        bio: user.bio || "",
-        instagram: user.instagram || "",
-        youtube: user.youtube || "",
-        avatar: user.avatar || "",
-        // Devolvemos el peso actual del usuario. Si no tiene, usamos el de su mejor marca, si no, 0.
-        bw: user.bw || (bestRecord ? bestRecord.bw : 0),
-        history: user.history || [],
-        globalRank: globalRank > 0 ? globalRank : "-",
-        bestScore: bestRecord ? bestRecord.score : 0
+// 2. Login
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
+        if (err || !user) return res.status(401).json({ error: 'Usuario no encontrado' });
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
+        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY);
+        res.json({ success: true, token, user: { id: user.id, name: user.name, country: user.country, email: user.email } });
     });
 });
 
-app.post('/api/profile/update', (req, res) => {
-    const { email, bio, instagram, youtube, avatar, bw } = req.body; // AÑADIDO bw
-    const db = readDB();
-    const userIndex = db.users.findIndex(u => u.email === email);
+// 3. Get Profile
+app.post('/api/get-profile', (req, res) => {
+    const { email } = req.body;
+    db.get(`SELECT * FROM users WHERE email = ?`, [email], (err, user) => {
+        if (err || !user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-    if (userIndex === -1) return res.status(404).json({ error: 'Usuario no encontrado' });
+        db.all(`SELECT * FROM history WHERE user_id = ? ORDER BY timestamp DESC`, [user.id], (err, history) => {
+            db.all(`SELECT email, score, bw FROM records ORDER BY score DESC`, [], (err, records) => {
+                const globalRank = records.findIndex(r => r.email === email) + 1;
+                const bestRecord = records.find(r => r.email === email);
 
-    db.users[userIndex].bio = bio;
-    db.users[userIndex].instagram = instagram;
-    db.users[userIndex].youtube = youtube;
-    if (bw) db.users[userIndex].bw = parseFloat(bw); // Actualizamos peso
-    if (avatar) db.users[userIndex].avatar = avatar;
-
-    writeDB(db);
-    res.json({ success: true });
+                res.json({
+                    name: user.name,
+                    country: user.country,
+                    bio: user.bio || "Sin descripción",
+                    instagram: user.instagram || "",
+                    youtube: user.youtube || "",
+                    avatar: user.avatar || "",
+                    bw: user.bw || (bestRecord ? bestRecord.bw : 0),
+                    history: history || [],
+                    globalRank: globalRank > 0 ? globalRank : "-",
+                    bestScore: bestRecord ? bestRecord.score : 0
+                });
+            });
+        });
+    });
 });
 
-app.post('/api/register', (req, res) => {
-    const { email, password, name, country } = req.body;
-    const db = readDB();
+// 4. Update Profile
+app.post('/api/profile/update', upload.single('avatar'), (req, res) => {
+    const { email, bio, instagram, youtube, bw } = req.body;
+    const avatarPath = req.file ? `/uploads/${req.file.filename}` : null;
 
-    if (db.users.find(u => u.email === email)) {
-        return res.status(400).json({ error: 'El usuario ya existe' });
+    let sql = `UPDATE users SET bio = ?, instagram = ?, youtube = ?, bw = ?`;
+    let params = [bio, instagram, youtube, parseFloat(bw)];
+
+    if (avatarPath) {
+        sql += `, avatar = ?`;
+        params.push(avatarPath);
     }
+    sql += ` WHERE email = ?`;
+    params.push(email);
 
-    const newUser = {
-        id: Date.now(), email, password, name, country,
-        history: [], bio: "", instagram: "", youtube: "", avatar: "", bw: 0
-    };
-    db.users.push(newUser);
-    writeDB(db);
-    res.json({ success: true, user: { name, country, email } });
+    db.run(sql, params, function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
 });
 
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    const db = readDB();
-    const user = db.users.find(u => u.email === email && u.password === password);
-
-    if (user) {
-        res.json({ success: true, user: { name: user.name, country: user.country, email: user.email } });
-    } else {
-        res.status(401).json({ error: 'Credenciales incorrectas' });
-    }
-});
-
+// 5. Upload Score
 app.post('/api/upload', (req, res) => {
     const { userEmail, device, score, bw, video } = req.body;
-    const db = readDB();
-
-    const userIndex = db.users.findIndex(u => u.email === userEmail);
-    if (userIndex === -1) return res.status(403).json({ error: 'Usuario no encontrado' });
-
     const now = Date.now();
     const todayDate = new Date().toISOString().split('T')[0];
     const scoreNum = parseFloat(score);
     const bwNum = parseFloat(bw);
 
-    // Actualizamos el peso actual del usuario con el de la última marca subida
-    db.users[userIndex].bw = bwNum;
+    db.get(`SELECT * FROM users WHERE email = ?`, [userEmail], (err, user) => {
+        if (err || !user) return res.status(403).json({ error: 'Usuario no encontrado' });
 
-    const newHistoryEntry = {
-        id: now, date: todayDate, device, score: scoreNum, bw: bwNum, video
-    };
-    db.users[userIndex].history.push(newHistoryEntry);
+        // Actualizar peso actual del usuario
+        db.run(`UPDATE users SET bw = ? WHERE id = ?`, [bwNum, user.id]);
 
-    const existingRecordIndex = db.records.findIndex(r => r.email === userEmail);
-    let isNewPR = false;
+        // Guardar en Historial
+        db.run(`INSERT INTO history (user_id, date, device, score, bw, video, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [user.id, todayDate, device, scoreNum, bwNum, video, now]);
 
-    if (existingRecordIndex > -1) {
-        if (scoreNum > db.records[existingRecordIndex].score) {
-            db.records[existingRecordIndex] = {
-                ...db.records[existingRecordIndex],
-                device, score: scoreNum, bw: bwNum, date: todayDate, timestamp: now, video, country: db.users[userIndex].country
-            };
-            isNewPR = true;
-        }
-    } else {
-        db.records.push({
-            id: now, email: userEmail, name: db.users[userIndex].name, country: db.users[userIndex].country,
-            device, score: scoreNum, bw: bwNum, date: todayDate, timestamp: now, video
+        // Gestionar Global
+        db.get(`SELECT * FROM records WHERE user_id = ?`, [user.id], (err, record) => {
+            let isNewPR = false;
+            if (record) {
+                if (scoreNum > record.score) {
+                    db.run(`UPDATE records SET score=?, bw=?, date=?, timestamp=?, video=?, device=? WHERE id=?`,
+                        [scoreNum, bwNum, todayDate, now, video, device, record.id]);
+                    isNewPR = true;
+                }
+            } else {
+                db.run(`INSERT INTO records (user_id, email, name, country, device, score, bw, date, timestamp, video) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [user.id, userEmail, user.name, user.country, device, scoreNum, bwNum, todayDate, now, video]);
+                isNewPR = true;
+            }
+            res.json({ success: true, isNewPR });
         });
-        isNewPR = true;
-    }
+    });
+});
 
-    writeDB(db);
-    res.json({ success: true, isNewPR });
+// 6. Get Ranking
+app.get('/api/records', (req, res) => {
+    db.all(`SELECT * FROM records ORDER BY score DESC`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
 });
 
 app.listen(PORT, () => {

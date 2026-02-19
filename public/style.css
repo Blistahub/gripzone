@@ -3,7 +3,6 @@
     --bg-panel: #1E1E1E;
     --bg-light: #2C2C2C;
     --accent: #F4C430;
-    /* Safety Yellow */
     --text-main: #FFFFFF;
     --text-muted: #A0A0A0;
     --border: #333333;
@@ -26,7 +25,7 @@ body {
     cursor: default;
 }
 
-/* --- SWEEP HOVER EFFECT (Botones y Selects) --- */
+/* EFECTOS HOVER */
 .sweep-hover,
 .sweep-hover-btn,
 .social-btn {
@@ -68,7 +67,7 @@ body {
     color: var(--bg-dark) !important;
 }
 
-/* --- NUEVO EFECTO: SLIDING BAR (Para Nombres de Usuario) --- */
+/* SLIDE HOVER */
 .hover-slide {
     position: relative;
     display: inline-block;
@@ -79,17 +78,14 @@ body {
     transition: color 0.3s ease;
 }
 
-/* La barra deslizante */
 .hover-slide::after {
     content: '';
     position: absolute;
     width: 100%;
     height: 2px;
-    /* Grosor de la barra */
     bottom: -2px;
     left: 0;
     background-color: #fff;
-    /* Barra blanca */
     transform: scaleX(0);
     transform-origin: bottom right;
     transition: transform 0.3s ease-out;
@@ -97,7 +93,6 @@ body {
 
 .hover-slide:hover {
     color: #fff;
-    /* El texto se vuelve blanco */
 }
 
 .hover-slide:hover::after {
@@ -105,8 +100,7 @@ body {
     transform-origin: bottom left;
 }
 
-
-/* --- COMPONENTS --- */
+/* COMPONENTS */
 .btn {
     padding: 10px 20px;
     border: none;
@@ -151,7 +145,7 @@ body {
     margin-top: 10px;
 }
 
-/* --- NAVBAR --- */
+/* NAVBAR & LANG */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -184,7 +178,6 @@ body {
     align-items: center;
 }
 
-/* Lang Selector */
 .lang-wrapper {
     position: relative;
     display: inline-block;
@@ -243,13 +236,12 @@ body {
     gap: 15px;
 }
 
-/* Quitamos estilos viejos del link de usuario, ahora usamos .hover-slide */
 .nav-user-link {
     font-size: 1.1rem;
     margin-right: 5px;
 }
 
-/* --- HERO --- */
+/* HERO & CONTROLS */
 .hero {
     background: linear-gradient(135deg, #0f0f0f 0%, #1e1e1e 100%);
     padding: 100px 20px;
@@ -279,7 +271,6 @@ body {
     font-weight: 600;
 }
 
-/* --- CONTROLS --- */
 .controls {
     display: flex;
     justify-content: center;
@@ -318,7 +309,7 @@ body {
     color: var(--accent);
 }
 
-/* --- TABLE --- */
+/* TABLE */
 .ranking-wrapper {
     padding: 40px;
     max-width: 1200px;
@@ -444,7 +435,7 @@ body {
     }
 }
 
-/* --- PERFIL --- */
+/* PERFIL */
 .profile-container {
     max-width: 1000px;
     margin: 40px auto;
@@ -586,6 +577,108 @@ body {
     background: #151515;
 }
 
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    margin-bottom: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+/* BADGES STYLES */
+.badges-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid #444;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: default;
+    user-select: none;
+}
+
+.badge:hover {
+    transform: scale(1.1) translateY(-2px);
+    z-index: 10;
+}
+
+.badge.trash {
+    border-color: #555;
+    color: #777;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.badge.bronze {
+    border-color: #cd7f32;
+    color: #cd7f32;
+    background: rgba(205, 127, 50, 0.1);
+}
+
+.badge.silver {
+    border-color: #C0C0C0;
+    color: #fff;
+    background: rgba(192, 192, 192, 0.1);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+.badge.gold {
+    border-color: #FFD700;
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+.badge.diamond {
+    border-color: #00f3ff;
+    color: #00f3ff;
+    background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+}
+
+.badge.mythic {
+    border: 1px solid #ff0055;
+    background: linear-gradient(45deg, rgba(255, 0, 85, 0.1), rgba(139, 0, 255, 0.1));
+    color: #ff0055;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    animation: mythicPulse 3s infinite;
+}
+
+@keyframes mythicPulse {
+    0% {
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+        border-color: #ff0055;
+        color: #ff0055;
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(180, 0, 255, 0.6);
+        border-color: #b400ff;
+        color: #b400ff;
+    }
+
+    100% {
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+        border-color: #ff0055;
+        color: #ff0055;
+    }
+}
+
 /* MODALS */
 .modal-backdrop {
     position: fixed;
@@ -720,5 +813,9 @@ form input:focus {
     .profile-socials {
         justify-content: center;
         flex-wrap: wrap;
+    }
+
+    .chart-container {
+        height: 200px;
     }
 }

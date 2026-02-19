@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Inter:wght@400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121212'/%3E%3Ctext x='5' y='52' font-family='Teko, Impact, sans-serif' font-weight='700' font-size='50' fill='white'%3EG%3C/text%3E%3Ctext x='32' y='52' font-family='Teko, Impact, sans-serif' font-weight='700' font-size='50' fill='%23F4C430'%3EZ%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="style.css">
@@ -17,7 +18,6 @@
 
     <nav class="navbar">
         <a href="/" class="logo sweep-hover">GRIP<span class="highlight">ZONE</span></a>
-
         <div class="nav-tools">
             <div class="lang-wrapper sweep-hover-btn">
                 <select id="langSelect">
@@ -28,9 +28,7 @@
                 </select>
                 <i class="fas fa-chevron-down lang-arrow"></i>
             </div>
-
             <button id="loginBtn" class="btn btn-outline sweep-hover-btn" data-i18n="login">Iniciar Sesión</button>
-
             <div id="userInfo" class="user-info hidden">
                 <span id="userNameDisplay" class="nav-user-link hover-slide">Usuario</span>
                 <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
@@ -39,7 +37,7 @@
         </div>
     </nav>
 
-    <!-- VISTA 1: RANKING GLOBAL -->
+    <!-- RANKING GLOBAL -->
     <section id="global-ranking-view">
         <header class="hero">
             <div class="hero-content">
@@ -47,7 +45,6 @@
                 <p data-i18n="hero_subtitle">BASE DE DATOS MUNDIAL DE FUERZA DE MANO</p>
             </div>
         </header>
-
         <section class="controls">
             <div class="filter-group">
                 <span class="filter-label" data-i18n="sort_by">Ordenar por:</span>
@@ -61,7 +58,6 @@
                     <i class="fas fa-sort"></i></button>
             </div>
         </section>
-
         <main class="ranking-wrapper">
             <table class="ranking-table">
                 <thead>
@@ -81,20 +77,18 @@
         </main>
     </section>
 
-    <!-- VISTA 2: PERFIL DE USUARIO -->
+    <!-- PERFIL USUARIO -->
     <section id="profile-view" class="hidden">
         <div class="profile-container">
             <div class="profile-header">
                 <div class="profile-img-col">
                     <img id="profile-avatar" src="" alt="Avatar" class="profile-avatar-img">
                 </div>
-
                 <div class="profile-info-col">
                     <h1 id="profile-name" class="profile-name">NOMBRE ATLETA</h1>
                     <div class="profile-meta">
                         <span id="profile-bio" class="profile-role">Descripción...</span>
                     </div>
-
                     <div class="profile-stats-grid">
                         <div class="stat-item">
                             <span class="stat-label" data-i18n="lbl_country">PAÍS</span>
@@ -105,7 +99,6 @@
                             <span id="profile-best" class="stat-value text-accent">00.0</span> <small>kg</small>
                         </div>
                         <div class="stat-item">
-                            <!-- NUEVO CAMPO: PESO -->
                             <span class="stat-label" data-i18n="lbl_current_bw">PESO</span>
                             <span id="profile-bw-display" class="stat-value text-accent">00.0</span> <small>kg</small>
                         </div>
@@ -115,12 +108,19 @@
                         </div>
                     </div>
 
+                    <!-- BADGES -->
+                    <div id="badges-container" class="badges-row"></div>
+
+                    <!-- CHART -->
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+
                     <div class="profile-socials">
                         <a id="link-insta" href="#" target="_blank" class="social-btn sweep-hover-btn"><i
                                 class="fab fa-instagram"></i> INSTAGRAM</a>
                         <a id="link-yt" href="#" target="_blank" class="social-btn sweep-hover-btn"><i
                                 class="fab fa-youtube"></i> YOUTUBE</a>
-                        <!-- Botón con traducción y efecto hover -->
                         <button id="editProfileBtn" class="btn btn-outline hidden sweep-hover-btn"
                             style="margin-left:auto; border-color:white; color:white"
                             data-i18n="btn_edit_profile">EDITAR PERFIL</button>
@@ -143,14 +143,12 @@
                     <tbody id="personalHistoryBody"></tbody>
                 </table>
             </div>
-
-            <!-- Botón volver con traducción y efecto hover -->
             <button onclick="goHome()" class="btn btn-outline sweep-hover-btn" style="margin-top:20px;"
                 data-i18n="btn_back_ranking">&larr; VOLVER AL RANKING</button>
         </div>
     </section>
 
-    <!-- MODAL: LOGIN / REGISTRO -->
+    <!-- MODALES -->
     <div id="authModal" class="modal-backdrop hidden">
         <div class="modal">
             <button class="close-modal">&times;</button>
@@ -176,7 +174,6 @@
         </div>
     </div>
 
-    <!-- MODAL: SUBIR MARCA -->
     <div id="uploadModal" class="modal-backdrop hidden">
         <div class="modal">
             <button class="close-modal">&times;</button>
@@ -200,7 +197,6 @@
         </div>
     </div>
 
-    <!-- MODAL: EDITAR PERFIL -->
     <div id="editProfileModal" class="modal-backdrop hidden">
         <div class="modal">
             <button class="close-modal">&times;</button>
