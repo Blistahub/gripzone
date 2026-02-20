@@ -8,7 +8,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 db.serialize(() => {
-    // Tabla Usuarios
+    // 1. Usuarios: Añadido campo 'role' (user/admin)
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE,
@@ -19,10 +19,11 @@ db.serialize(() => {
         instagram TEXT,
         youtube TEXT,
         avatar TEXT,
-        bw REAL DEFAULT 0
+        bw REAL DEFAULT 0,
+        role TEXT DEFAULT 'user' 
     )`);
 
-    // Tabla Récords (Ranking Global - Solo la mejor marca)
+    // 2. Records: Añadido campo 'status' (pending/verified)
     db.run(`CREATE TABLE IF NOT EXISTS records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
@@ -35,10 +36,11 @@ db.serialize(() => {
         date TEXT,
         timestamp INTEGER,
         video TEXT,
+        status TEXT DEFAULT 'pending',
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 
-    // Tabla Historial (Todas las marcas personales)
+    // 3. Historial (Personal)
     db.run(`CREATE TABLE IF NOT EXISTS history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,

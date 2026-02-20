@@ -435,6 +435,21 @@ body {
     }
 }
 
+/* VERIFICACIÓN */
+.verified-icon {
+    color: #00f3ff;
+    margin-left: 5px;
+    font-size: 0.9rem;
+    filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
+}
+
+.pending-text {
+    color: #ff9900;
+    font-size: 0.8rem;
+    font-style: italic;
+    margin-left: 5px;
+}
+
 /* PERFIL */
 .profile-container {
     max-width: 1000px;
@@ -679,6 +694,75 @@ body {
     }
 }
 
+/* ADMIN PANEL */
+.admin-grid {
+    display: grid;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.review-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.review-info h3 {
+    margin: 0 0 5px 0;
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+}
+
+.review-info p {
+    margin: 0;
+    color: #aaa;
+}
+
+.review-info .highlight {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.review-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-approve {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-family: var(--font-head);
+    transition: 0.3s;
+}
+
+.btn-approve:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+.btn-reject {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    color: #ff0000;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-family: var(--font-head);
+    transition: 0.3s;
+}
+
+.btn-reject:hover {
+    background: #ff0000;
+    color: #000;
+}
+
 /* MODALS */
 .modal-backdrop {
     position: fixed;
@@ -817,5 +901,15 @@ form input:focus {
 
     .chart-container {
         height: 200px;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .review-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
     }
 }

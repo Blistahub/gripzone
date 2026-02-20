@@ -18,6 +18,7 @@
 
     <nav class="navbar">
         <a href="/" class="logo sweep-hover">GRIP<span class="highlight">ZONE</span></a>
+
         <div class="nav-tools">
             <div class="lang-wrapper sweep-hover-btn">
                 <select id="langSelect">
@@ -28,8 +29,14 @@
                 </select>
                 <i class="fas fa-chevron-down lang-arrow"></i>
             </div>
+
             <button id="loginBtn" class="btn btn-outline sweep-hover-btn" data-i18n="login">Iniciar Sesión</button>
+
             <div id="userInfo" class="user-info hidden">
+                <!-- Botón Admin (Solo visible para admins) -->
+                <button id="adminBtn" class="btn btn-icon hidden" style="color:#00f3ff; margin-right:15px"
+                    title="Panel Juez"><i class="fas fa-gavel fa-lg"></i></button>
+
                 <span id="userNameDisplay" class="nav-user-link hover-slide">Usuario</span>
                 <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
                 <button id="uploadBtn" class="btn btn-primary sweep-hover-btn" data-i18n="upload">Nueva Marca</button>
@@ -108,10 +115,7 @@
                         </div>
                     </div>
 
-                    <!-- BADGES -->
                     <div id="badges-container" class="badges-row"></div>
-
-                    <!-- CHART -->
                     <div class="chart-container">
                         <canvas id="progressChart"></canvas>
                     </div>
@@ -145,6 +149,18 @@
             </div>
             <button onclick="goHome()" class="btn btn-outline sweep-hover-btn" style="margin-top:20px;"
                 data-i18n="btn_back_ranking">&larr; VOLVER AL RANKING</button>
+        </div>
+    </section>
+
+    <!-- ADMIN PANEL (NUEVO) -->
+    <section id="admin-view" class="hidden">
+        <div class="profile-container">
+            <h1 class="modal-title" style="text-align:left; border-bottom:1px solid #333; padding-bottom:10px;">
+                <i class="fas fa-gavel"></i> JUEZ GRIPZONE
+            </h1>
+            <div id="pending-list" class="admin-grid"></div>
+            <button onclick="goHome()" class="btn btn-outline sweep-hover-btn" style="margin-top:20px;">&larr; VOLVER AL
+                RANKING</button>
         </div>
     </section>
 
@@ -205,19 +221,14 @@
                 <label data-i18n="lbl_edit_photo">Foto de Perfil</label>
                 <input type="file" id="editAvatar" accept="image/*"
                     style="padding:5px; border:1px solid #333; width:100%; margin-bottom:15px; background:#111">
-
                 <label data-i18n="lbl_edit_bw">Peso Corporal (KG)</label>
                 <input type="number" id="editBwInput" step="0.1" required>
-
                 <label data-i18n="lbl_edit_bio">Descripción / Bio</label>
                 <input type="text" id="editBio" data-i18n-ph="ph_bio" placeholder="Armwrestler, Climber...">
-
                 <label>Instagram Link</label>
                 <input type="url" id="editInsta" placeholder="https://instagram.com/...">
-
                 <label>YouTube Link</label>
                 <input type="url" id="editYt" placeholder="https://youtube.com/...">
-
                 <button type="submit" class="btn btn-primary full-width sweep-hover-btn"
                     data-i18n="btn_save_changes">GUARDAR CAMBIOS</button>
             </form>

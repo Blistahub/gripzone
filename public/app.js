@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- NAVIGATION ---
 function goHome() {
     document.getElementById('profile-view').classList.add('hidden');
+    document.getElementById('admin-view').classList.add('hidden');
     document.getElementById('global-ranking-view').classList.remove('hidden');
     fetchRecords();
 }
@@ -134,6 +135,7 @@ async function loadProfile(email) {
         renderPersonalTable(data.history || []);
 
         document.getElementById('global-ranking-view').classList.add('hidden');
+        document.getElementById('admin-view').classList.add('hidden');
         document.getElementById('profile-view').classList.remove('hidden');
         window.scrollTo(0, 0);
 
@@ -142,11 +144,10 @@ async function loadProfile(email) {
     }
 }
 
-// --- RENDER BADGES (ADVANCED) ---
+// --- BADGES ---
 function renderBadges(bestScore, bw, history) {
     const container = document.getElementById('badges-container');
     container.innerHTML = '';
-
     const badges = [];
 
     // 1. FUERZA ABSOLUTA
@@ -167,13 +168,23 @@ function renderBadges(bestScore, bw, history) {
     if (bw > 0 && bestScore > 0) {
         const ratio = bestScore / bw;
         if (ratio >= 2.0) { badges.push({ icon: 'fa-spider', text: 'THE SPIDER (2.0x)', class: 'mythic' }); }
+        else if (ratio >= 1.9) { badges.push({ icon: 'fa-dragon', text: 'THE T-REX (1.9x)', class: 'mythic' }); }
         else if (ratio >= 1.8) { badges.push({ icon: 'fa-pastafarianism', text: 'THE CRAB (1.8x)', class: 'diamond' }); }
+        else if (ratio >= 1.7) { badges.push({ icon: 'fa-dumbbell', text: 'THE GORILLA (1.7x)', class: 'diamond' }); }
+        else if (ratio >= 1.6) { badges.push({ icon: 'fa-feather-alt', text: 'THE EAGLE (1.6x)', class: 'gold' }); }
         else if (ratio >= 1.5) { badges.push({ icon: 'fa-bug', text: 'THE ANT (1.5x)', class: 'gold' }); }
-        else if (ratio >= 1.2) { badges.push({ icon: 'fa-cat', text: 'POUND 4 POUND (1.2x)', class: 'silver' }); }
-        else if (ratio >= 1.0) { badges.push({ icon: 'fa-balance-scale', text: 'BALANCED (1.0x)', class: 'bronze' }); }
+        else if (ratio >= 1.4) { badges.push({ icon: 'fa-monument', text: 'THE CHIMP (1.4x)', class: 'gold' }); }
+        else if (ratio >= 1.3) { badges.push({ icon: 'fa-staff-snake', text: 'THE PYTHON (1.3x)', class: 'silver' }); }
+        else if (ratio >= 1.2) { badges.push({ icon: 'fa-cat', text: 'THE LEOPARD (1.2x)', class: 'silver' }); }
+        else if (ratio >= 1.1) { badges.push({ icon: 'fa-dog', text: 'THE BULLDOG (1.1x)', class: 'silver' }); }
+        else if (ratio >= 1.0) { badges.push({ icon: 'fa-wolf-pack-battalion', text: 'THE WOLF (1.0x)', class: 'bronze' }); }
+        else if (ratio >= 0.9) { badges.push({ icon: 'fa-cat', text: 'THE CAT (0.9x)', class: 'bronze' }); }
+        else if (ratio >= 0.8) { badges.push({ icon: 'fa-tree', text: 'THE SQUIRREL (0.8x)', class: 'bronze' }); }
+        else if (ratio >= 0.7) { badges.push({ icon: 'fa-leaf', text: 'THE KOALA (0.7x)', class: 'trash' }); }
+        else if (ratio >= 0.6) { badges.push({ icon: 'fa-bed', text: 'THE SLOTH (0.6x)', class: 'trash' }); }
+        else { badges.push({ icon: 'fa-water', text: 'JELLYFISH (<0.6x)', class: 'trash' }); }
     }
 
-    // 3. FIDELIDAD
     if (history.length > 0) { badges.push({ icon: 'fa-flag-checkered', text: 'DEBUT', class: 'silver' }); }
     if (history.length >= 10) { badges.push({ icon: 'fa-medal', text: 'VETERAN', class: 'gold' }); }
     else if (history.length >= 5) { badges.push({ icon: 'fa-star', text: 'CONSISTENT', class: 'bronze' }); }
@@ -187,12 +198,15 @@ function renderBadges(bestScore, bw, history) {
     });
 }
 
-// --- RENDER CHART ---
+// --- CHART ---
 function renderChart(history) {
     const ctx = document.getElementById('progressChart').getContext('2d');
-    const chartData = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
-    if (chartData.length === 0) chartData.push({ date: 'Start', score: 0 });
+    const chartData = [...history].sort((a, b) => {
+        if (a.timestamp && b.timestamp) return a.timestamp - b.timestamp;
+        return new Date(a.date) - new Date(b.date);
+    });
 
+    if (chartData.length === 0) chartData.push({ date: 'Start', score: 0 });
     const labels = chartData.map(d => d.date);
     const dataPoints = chartData.map(d => d.score);
 
@@ -232,7 +246,7 @@ function renderPersonalTable(history) {
     const tbody = document.getElementById('personalHistoryBody');
     tbody.innerHTML = '';
     const safeHistory = [...history];
-    safeHistory.sort((a, b) => b.id - a.id);
+    safeHistory.sort((a, b) => (b.timestamp || b.id) - (a.timestamp || a.id));
 
     safeHistory.forEach(r => {
         let videoContent = (r.video && r.video.trim() !== '') ? `<a href="${r.video}" target="_blank" class="video-link"><i class="fas fa-play-circle fa-lg"></i></a>` : `<span style="color:#333">-</span>`;
@@ -246,6 +260,51 @@ function renderPersonalTable(history) {
         `;
         tbody.appendChild(tr);
     });
+}
+
+// --- ADMIN FUNCTIONS ---
+function loadAdminPanel() {
+    document.getElementById('global-ranking-view').classList.add('hidden');
+    document.getElementById('profile-view').classList.add('hidden');
+    document.getElementById('admin-view').classList.remove('hidden');
+
+    fetch(`${API_URL}/admin/pending`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: currentUser.email })
+    })
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('pending-list');
+            container.innerHTML = '';
+            if (data.length === 0) container.innerHTML = '<p style="text-align:center; color:#666">No hay marcas pendientes.</p>';
+
+            data.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+                <div class="review-info">
+                    <h3>${r.name} <small style="font-size:1rem; color:#666">(${r.country})</small></h3>
+                    <p><span class="highlight">${r.score} kg</span> en ${r.device} (BW: ${r.bw})</p>
+                    <p style="margin-top:5px;"><a href="${r.video}" target="_blank" style="color:#F4C430">Ver Video <i class="fas fa-external-link-alt"></i></a></p>
+                </div>
+                <div class="review-actions">
+                    <button class="btn-approve" onclick="verifyRecord(${r.id}, 'approve')"><i class="fas fa-check"></i> APROBAR</button>
+                    <button class="btn-reject" onclick="verifyRecord(${r.id}, 'reject')"><i class="fas fa-times"></i> RECHAZAR</button>
+                </div>
+            `;
+                container.appendChild(card);
+            });
+        });
+}
+
+async function verifyRecord(recordId, action) {
+    if (!confirm(`¿Seguro que quieres ${action} esta marca?`)) return;
+    const res = await fetch(`${API_URL}/admin/verify`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminEmail: currentUser.email, recordId, action })
+    });
+    const result = await res.json();
+    if (result.success) { loadAdminPanel(); } else { alert('Error'); }
 }
 
 // --- UTILS & API ---
@@ -281,13 +340,21 @@ function renderTable() {
 
     records.forEach((r, index) => {
         let newPrBadge = (r.timestamp && (now - r.timestamp < MS_IN_48H)) ? '<span class="new-pr">NEW PR</span>' : '';
-        let videoContent = (r.video && r.video.trim() !== '') ? `<a href="${r.video}" target="_blank" class="video-link"><i class="fas fa-play-circle fa-lg"></i></a>` : `<span style="color:#333; font-size:1.2rem;">-</span>`;
+
+        let verifiedBadge = '';
+        if (r.status === 'verified') {
+            verifiedBadge = '<i class="fas fa-check-circle verified-icon" title="Verificado"></i>';
+        } else if (currentUser && r.email === currentUser.email) {
+            verifiedBadge = '<span class="pending-text">(Pendiente)</span>';
+        }
+
+        let videoContent = (r.video && r.video.trim() !== '') ? `<a href="${r.video}" target="_blank" class="video-link"><i class="fas fa-play-circle fa-lg"></i></a>` : `<span style="color:#333">-</span>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="th-rank">${index + 1}</td>
             <td>
-                <div class="profile-link hover-slide" onclick="loadProfile('${r.email}')">${r.name}</div>
+                <div class="profile-link hover-slide" onclick="loadProfile('${r.email}')">${r.name} ${verifiedBadge}</div>
             </td>
             <td><img src="https://flagcdn.com/${r.country.toLowerCase()}.svg" class="flag-icon"> ${r.country}</td>
             <td><span class="device-tag">${r.device}</span></td>
@@ -391,7 +458,7 @@ function setupEventListeners() {
     document.getElementById('upload-form').onsubmit = async (e) => {
         e.preventDefault();
         const res = await uploadRecord({ device: document.getElementById('upDevice').value, score: document.getElementById('upScore').value, bw: document.getElementById('upBw').value, video: document.getElementById('upVideo').value });
-        if (res.success) { uploadModal.classList.add('hidden'); fetchRecords(); alert('Marca subida!'); if (currentProfileEmail === currentUser.email) loadProfile(currentUser.email); }
+        if (res.success) { uploadModal.classList.add('hidden'); fetchRecords(); alert('Marca subida (Pendiente de Verificación)!'); if (currentProfileEmail === currentUser.email) loadProfile(currentUser.email); }
         else alert('Error');
     };
     document.getElementById('logoutBtn').onclick = () => { currentUser = null; localStorage.removeItem('gripzone_user'); updateAuthUI(); goHome(); };
@@ -402,6 +469,14 @@ function updateAuthUI() {
         document.getElementById('loginBtn').classList.add('hidden');
         document.getElementById('userInfo').classList.remove('hidden');
         document.getElementById('userNameDisplay').textContent = currentUser.name;
+
+        // MOSTRAR BOTÓN ADMIN
+        if (currentUser.role === 'admin') {
+            document.getElementById('adminBtn').classList.remove('hidden');
+            document.getElementById('adminBtn').onclick = loadAdminPanel;
+        } else {
+            document.getElementById('adminBtn').classList.add('hidden');
+        }
     } else {
         document.getElementById('loginBtn').classList.remove('hidden');
         document.getElementById('userInfo').classList.add('hidden');
