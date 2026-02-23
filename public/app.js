@@ -7,66 +7,10 @@ let sortState = { key: 'score', order: 'desc' };
 let myChart = null;
 
 const translations = {
-    es: {
-        login: "Iniciar Sesión", upload: "Subir Marca",
-        hero_title: 'GRIP<span class="highlight">ZONE</span> RANKING',
-        hero_subtitle: "BASE DE DATOS MUNDIAL DE FUERZA DE MANO",
-        sort_by: "Ordenar por:", btn_score: "Marca", btn_bw: "Peso Corp.", btn_date: "Fecha", btn_country: "País",
-        th_athlete: "Atleta", th_country: "País", th_device: "Dispositivo", th_score: "Marca", th_bw: "Peso", th_date: "Fecha", th_video: "Video",
-        tab_login: "Entrar", tab_register: "Registrarse", btn_enter: "Entrar", btn_register: "Crear Cuenta",
-        upload_header: "Registrar Marca", lbl_device: "Dinamómetro", lbl_score: "Marca (KG)", lbl_bw: "Peso (KG)", lbl_video: "Video Link", btn_submit: "Guardar",
-        ph_email: "Correo Electrónico", ph_pass: "Contraseña", ph_name: "Nombre y Apellidos", ph_country: "País (Código ISO: ES, MX...)",
-        ph_video: "Enlace de Youtube (Opcional)",
-        lbl_country: "PAÍS", lbl_best_score: "MEJOR MARCA", lbl_current_bw: "PESO", lbl_rank_global: "RANK GLOBAL",
-        btn_edit_profile: "EDITAR PERFIL", btn_back_ranking: "VOLVER AL RANKING", title_history: "HISTORIAL DE AGARRE",
-        modal_edit_title: "EDITAR PERFIL", lbl_edit_photo: "Foto de Perfil", lbl_edit_bw: "Peso Corporal (KG)", lbl_edit_bio: "Descripción / Bio",
-        ph_bio: "Ej: Armwrestler, Escalador...", btn_save_changes: "GUARDAR CAMBIOS"
-    },
-    en: {
-        login: "Login", upload: "Add Score",
-        hero_title: 'GRIP<span class="highlight">ZONE</span> RANKING',
-        hero_subtitle: "WORLDWIDE STRENGTH DATABASE",
-        sort_by: "Sort by:", btn_score: "Score", btn_bw: "Bodyweight", btn_date: "Date", btn_country: "Country",
-        th_athlete: "Athlete", th_country: "Country", th_device: "Device", th_score: "Score", th_bw: "Weight", th_date: "Date", th_video: "Video",
-        tab_login: "Login", tab_register: "Register", btn_enter: "Log In", btn_register: "Sign Up",
-        upload_header: "New Record", lbl_device: "Dynamometer", lbl_score: "Score (KG)", lbl_bw: "BW (KG)", lbl_video: "Video Link", btn_submit: "Save",
-        ph_email: "Email Address", ph_pass: "Password", ph_name: "Full Name", ph_country: "Country Code (US, UK...)",
-        ph_video: "YouTube Link (Optional)",
-        lbl_country: "COUNTRY", lbl_best_score: "BEST SCORE", lbl_current_bw: "WEIGHT", lbl_rank_global: "GLOBAL RANK",
-        btn_edit_profile: "EDIT PROFILE", btn_back_ranking: "BACK TO RANKING", title_history: "GRIP HISTORY",
-        modal_edit_title: "EDIT PROFILE", lbl_edit_photo: "Profile Photo", lbl_edit_bw: "Body Weight (KG)", lbl_edit_bio: "Description / Bio",
-        ph_bio: "Ex: Armwrestler, Climber...", btn_save_changes: "SAVE CHANGES"
-    },
-    ru: {
-        login: "Войти", upload: "Добавить",
-        hero_title: 'GRIP<span class="highlight">ZONE</span> РЕЙТИНГ',
-        hero_subtitle: "МИРОВАЯ БАЗА ДАННЫХ",
-        sort_by: "Сортировка:", btn_score: "Результат", btn_bw: "Вес тела", btn_date: "Дата", btn_country: "Страна",
-        th_athlete: "Атлет", th_country: "Страна", th_device: "Прибор", th_score: "Результат", th_bw: "Вес", th_date: "Дата", th_video: "Видео",
-        tab_login: "Вход", tab_register: "Регистрация", btn_enter: "Войти", btn_register: "Создать аккаунт",
-        upload_header: "Новый рекорд", lbl_device: "Динамометр", lbl_score: "Результат (КГ)", lbl_bw: "Вес (КГ)", lbl_video: "Ссылка на видео", btn_submit: "Сохранить",
-        ph_email: "Электронная почта", ph_pass: "Пароль", ph_name: "Полное имя", ph_country: "Код страны (RU, KZ...)",
-        ph_video: "Ссылка на YouTube (Необязательно)",
-        lbl_country: "СТРАНА", lbl_best_score: "ЛУЧШИЙ", lbl_current_bw: "ВЕС ТЕЛА", lbl_rank_global: "РЕЙТИНГ",
-        btn_edit_profile: "РЕДАКТИРОВАТЬ", btn_back_ranking: "НАЗАД В РЕЙТИНГ", title_history: "ИСТОРИЯ",
-        modal_edit_title: "РЕДАКТИРОВАТЬ", lbl_edit_photo: "Фото профиля", lbl_edit_bw: "Вес тела (КГ)", lbl_edit_bio: "Описание",
-        ph_bio: "Пример: Армрестлер...", btn_save_changes: "СОХРАНИТЬ"
-    },
-    cn: {
-        login: "登录", upload: "上传成绩",
-        hero_title: 'GRIP<span class="highlight">ZONE</span> 排名',
-        hero_subtitle: "全球握力数据库",
-        sort_by: "排序方式:", btn_score: "分数", btn_bw: "体重", btn_date: "日期", btn_country: "国家",
-        th_athlete: "运动员", th_country: "国家", th_device: "设备", th_score: "分数", th_bw: "体重", th_date: "日期", th_video: "视频",
-        tab_login: "登录", tab_register: "注册", btn_enter: "进入", btn_register: "创建账户",
-        upload_header: "新记录", lbl_device: "测力计", lbl_score: "分数 (KG)", lbl_bw: "体重 (KG)", lbl_video: "视频链接", btn_submit: "提交",
-        ph_email: "电子邮件", ph_pass: "密码", ph_name: "全名", ph_country: "国家代码 (CN, JP...)",
-        ph_video: "YouTube 链接 (可选)",
-        lbl_country: "国家", lbl_best_score: "最佳成绩", lbl_current_bw: "体重", lbl_rank_global: "全球排名",
-        btn_edit_profile: "编辑资料", btn_back_ranking: "返回排名", title_history: "历史记录",
-        modal_edit_title: "编辑资料", lbl_edit_photo: "头像", lbl_edit_bw: "体重 (KG)", lbl_edit_bio: "简介",
-        ph_bio: "例如：扳手腕运动员...", btn_save_changes: "保存更改"
-    }
+    es: { login: "Iniciar Sesión", upload: "Subir Marca", hero_title: 'GRIP<span class="highlight">ZONE</span> RANKING', hero_subtitle: "BASE DE DATOS MUNDIAL DE FUERZA DE MANO", sort_by: "Ordenar por:", btn_score: "Marca", btn_bw: "Peso Corp.", btn_date: "Fecha", btn_country: "País", th_athlete: "Atleta", th_country: "País", th_device: "Dispositivo", th_score: "Marca", th_bw: "Peso", th_date: "Fecha", th_video: "Video", tab_login: "Entrar", tab_register: "Registrarse", btn_enter: "Entrar", btn_register: "Crear Cuenta", upload_header: "Registrar Marca", lbl_device: "Dinamómetro", lbl_score: "Marca (KG)", lbl_bw: "Peso (KG)", lbl_video: "Video Link", btn_submit: "Guardar", ph_email: "Correo Electrónico", ph_pass: "Contraseña", ph_name: "Nombre y Apellidos", ph_country: "País (Código ISO: ES, MX...)", ph_video: "Enlace de Youtube (Opcional)", lbl_country: "PAÍS", lbl_best_score: "MEJOR MARCA", lbl_current_bw: "PESO", lbl_rank_global: "RANK GLOBAL", btn_edit_profile: "EDITAR PERFIL", btn_back_ranking: "VOLVER AL RANKING", title_history: "HISTORIAL DE AGARRE", modal_edit_title: "EDITAR PERFIL", lbl_edit_photo: "Foto de Perfil", lbl_edit_bw: "Peso Corporal (KG)", lbl_edit_bio: "Descripción / Bio", ph_bio: "Ej: Armwrestler, Escalador...", btn_save_changes: "GUARDAR CAMBIOS" },
+    en: { login: "Login", upload: "Add Score", hero_title: 'GRIP<span class="highlight">ZONE</span> RANKING', hero_subtitle: "WORLDWIDE STRENGTH DATABASE", sort_by: "Sort by:", btn_score: "Score", btn_bw: "Bodyweight", btn_date: "Date", btn_country: "Country", th_athlete: "Athlete", th_country: "Country", th_device: "Device", th_score: "Score", th_bw: "Weight", th_date: "Date", th_video: "Video", tab_login: "Login", tab_register: "Register", btn_enter: "Log In", btn_register: "Sign Up", upload_header: "New Record", lbl_device: "Dynamometer", lbl_score: "Score (KG)", lbl_bw: "BW (KG)", lbl_video: "Video Link", btn_submit: "Save", ph_email: "Email Address", ph_pass: "Password", ph_name: "Full Name", ph_country: "Country Code (US, UK...)", ph_video: "YouTube Link (Optional)", lbl_country: "COUNTRY", lbl_best_score: "BEST SCORE", lbl_current_bw: "WEIGHT", lbl_rank_global: "GLOBAL RANK", btn_edit_profile: "EDIT PROFILE", btn_back_ranking: "BACK TO RANKING", title_history: "GRIP HISTORY", modal_edit_title: "EDIT PROFILE", lbl_edit_photo: "Profile Photo", lbl_edit_bw: "Body Weight (KG)", lbl_edit_bio: "Description / Bio", ph_bio: "Ex: Armwrestler, Climber...", btn_save_changes: "SAVE CHANGES" },
+    ru: { login: "Войти", upload: "Добавить", hero_title: 'GRIP<span class="highlight">ZONE</span> РЕЙТИНГ', hero_subtitle: "МИРОВАЯ БАЗА ДАННЫХ", sort_by: "Сортировка:", btn_score: "Результат", btn_bw: "Вес тела", btn_date: "Дата", btn_country: "Страна", th_athlete: "Атлет", th_country: "Страна", th_device: "Прибор", th_score: "Результат", th_bw: "Вес", th_date: "Дата", th_video: "Видео", tab_login: "Вход", tab_register: "Регистрация", btn_enter: "Войти", btn_register: "Создать аккаунт", upload_header: "Новый рекорд", lbl_device: "Динамометр", lbl_score: "Результат (КГ)", lbl_bw: "Вес (КГ)", lbl_video: "Ссылка на видео", btn_submit: "Сохранить", ph_email: "Электронная почта", ph_pass: "Пароль", ph_name: "Полное имя", ph_country: "Код страны (RU, KZ...)", ph_video: "Ссылка на YouTube (Необязательно)", lbl_country: "СТРАНА", lbl_best_score: "ЛУЧШИЙ", lbl_current_bw: "ВЕС ТЕЛА", lbl_rank_global: "РЕЙТИНГ", btn_edit_profile: "РЕДАКТИРОВАТЬ", btn_back_ranking: "НАЗАД В РЕЙТИНГ", title_history: "ИСТОРИЯ", modal_edit_title: "РЕДАКТИРОВАТЬ", lbl_edit_photo: "Фото профиля", lbl_edit_bw: "Вес тела (КГ)", lbl_edit_bio: "Описание", ph_bio: "Пример: Армрестлер...", btn_save_changes: "СОХРАНИТЬ" },
+    cn: { login: "登录", upload: "上传成绩", hero_title: 'GRIP<span class="highlight">ZONE</span> 排名', hero_subtitle: "全球握力数据库", sort_by: "排序方式:", btn_score: "分数", btn_bw: "体重", btn_date: "日期", btn_country: "国家", th_athlete: "运动员", th_country: "国家", th_device: "设备", th_score: "分数", th_bw: "体重", th_date: "日期", th_video: "视频", tab_login: "登录", tab_register: "注册", btn_enter: "进入", btn_register: "创建账户", upload_header: "新记录", lbl_device: "测力计", lbl_score: "分数 (KG)", lbl_bw: "体重 (KG)", lbl_video: "视频链接", btn_submit: "提交", ph_email: "电子邮件", ph_pass: "密码", ph_name: "全名", ph_country: "国家代码 (CN, JP...)", ph_video: "YouTube 链接 (可选)", lbl_country: "国家", lbl_best_score: "最佳成绩", lbl_current_bw: "体重", lbl_rank_global: "全球排名", btn_edit_profile: "编辑资料", btn_back_ranking: "返回排名", title_history: "历史记录", modal_edit_title: "编辑资料", lbl_edit_photo: "头像", lbl_edit_bw: "体重 (KG)", lbl_edit_bio: "简介", ph_bio: "例如：扳手腕运动员...", btn_save_changes: "保存更改" }
 };
 
 // --- INIT ---
@@ -77,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLanguage();
 });
 
-// --- NAVIGATION ---
 function goHome() {
     document.getElementById('profile-view').classList.add('hidden');
     document.getElementById('admin-view').classList.add('hidden');
@@ -95,11 +38,9 @@ async function loadProfile(email) {
         if (!res.ok) throw new Error('Error en servidor');
         const data = await res.json();
 
-        // SEGURIDAD: Si no hay marcas verificadas, usamos 0 para evitar errores visuales
         const safeBW = data.bw || 0;
         const safeBestScore = data.bestScore || 0;
 
-        // UI Fill
         document.getElementById('profile-name').textContent = data.name;
         document.getElementById('profile-country').innerHTML = `<img src="https://flagcdn.com/${data.country.toLowerCase()}.svg" class="flag-icon"> ${data.country}`;
         document.getElementById('profile-bio').textContent = data.bio;
@@ -112,12 +53,8 @@ async function loadProfile(email) {
 
         const instaBtn = document.getElementById('link-insta');
         const ytBtn = document.getElementById('link-yt');
-
-        if (data.instagram) { instaBtn.href = data.instagram; instaBtn.classList.remove('hidden'); }
-        else instaBtn.classList.add('hidden');
-
-        if (data.youtube) { ytBtn.href = data.youtube; ytBtn.classList.remove('hidden'); }
-        else ytBtn.classList.add('hidden');
+        if (data.instagram) { instaBtn.href = data.instagram; instaBtn.classList.remove('hidden'); } else instaBtn.classList.add('hidden');
+        if (data.youtube) { ytBtn.href = data.youtube; ytBtn.classList.remove('hidden'); } else ytBtn.classList.add('hidden');
 
         const editBtn = document.getElementById('editProfileBtn');
         if (currentUser && currentUser.email === email) {
@@ -150,7 +87,7 @@ function renderBadges(bestScore, bw, history) {
     container.innerHTML = '';
     const badges = [];
 
-    // 1. FUERZA ABSOLUTA
+    // ABSOLUTA
     if (bestScore > 0) {
         if (bestScore >= 120) badges.push({ icon: 'fa-khanda', text: '120KG+ HYDRAULIC', class: 'mythic' });
         else if (bestScore >= 110) badges.push({ icon: 'fa-dumbbell', text: '110KG TITAN', class: 'mythic' });
@@ -164,7 +101,7 @@ function renderBadges(bestScore, bw, history) {
         else badges.push({ icon: 'fa-baby', text: 'BABY GRIP', class: 'trash' });
     }
 
-    // 2. FUERZA RELATIVA
+    // RELATIVA
     if (bw > 0 && bestScore > 0) {
         const ratio = bestScore / bw;
         if (ratio >= 2.0) badges.push({ icon: 'fa-spider', text: 'THE SPIDER (2.0x)', class: 'mythic' });
@@ -201,15 +138,12 @@ function renderBadges(bestScore, bw, history) {
 // --- RENDER CHART ---
 function renderChart(history) {
     const ctx = document.getElementById('progressChart').getContext('2d');
-
-    // Ordenar cronológicamente usando timestamp si existe
     const chartData = [...history].sort((a, b) => {
         if (a.timestamp && b.timestamp) return a.timestamp - b.timestamp;
         return new Date(a.date) - new Date(b.date);
     });
 
     if (chartData.length === 0) chartData.push({ date: 'Start', score: 0 });
-
     const labels = chartData.map(d => d.date);
     const dataPoints = chartData.map(d => d.score);
 
@@ -252,7 +186,10 @@ function renderPersonalTable(history) {
     safeHistory.sort((a, b) => (b.timestamp || b.id) - (a.timestamp || a.id));
 
     safeHistory.forEach(r => {
-        let videoContent = (r.video && r.video.trim() !== '') ? `<a href="${r.video}" target="_blank" class="video-link"><i class="fas fa-play-circle fa-lg"></i></a>` : `<span style="color:#333">-</span>`;
+        let videoContent = (r.video && r.video.trim() !== '') ?
+            `<a href="${r.video}" target="_blank" class="video-btn-square"><i class="fas fa-play"></i></a>` :
+            `<span style="color:#333">-</span>`;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="color:var(--text-muted)">${r.date}</td>
@@ -263,6 +200,46 @@ function renderPersonalTable(history) {
         `;
         tbody.appendChild(tr);
     });
+}
+
+// --- NEW ELEMENTS RENDERERS ---
+function renderPodium(data) {
+    const container = document.getElementById('podium-container');
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div style="color:#666">Esperando a los primeros campeones...</div>';
+        return;
+    }
+    const top3 = data.slice(0, 3);
+    let html = '';
+    top3.forEach((r, index) => {
+        const rank = index + 1;
+        const avatarUrl = r.avatar ? r.avatar : '';
+        let imgHtml = avatarUrl ? `<img src="${avatarUrl}" class="podium-avatar">` : `<div class="podium-avatar" style="background:#000; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="font-size:2rem; color:#555;"></i></div>`;
+
+        html += `
+            <div class="podium-card rank-${rank}" onclick="loadProfile('${r.email}')">
+                <div class="podium-rank">#${rank}</div>
+                ${imgHtml} 
+                <div class="podium-info">
+                    <div class="podium-name">${r.name}</div>
+                    <div class="podium-score">${r.score.toFixed(2)} KG</div>
+                    <div style="font-size:0.8rem; color:#888">${r.device}</div>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function renderTicker(data) {
+    const ticker = document.getElementById('liveTicker');
+    let items = [];
+    items.push(`⚡ BIENVENIDO A GRIPZONE GLOBAL RANKINGS`);
+    data.slice(0, 5).forEach(r => { items.push(`🏆 ${r.name.toUpperCase()}: ${r.score}KG (${r.device})`); });
+    items.push(`💪 ENTRENA. APRIETA. DOMINA.`);
+    items.push(`🌍 ${data.length} MARCAS VERIFICADAS EN EL SISTEMA`);
+    const content = items.map(t => `<div class="ticker-item">${t}</div>`).join('');
+    ticker.innerHTML = content + content;
 }
 
 // --- ADMIN FUNCTIONS ---
@@ -311,15 +288,57 @@ async function verifyRecord(recordId, action) {
 }
 
 // --- UTILS & API ---
+async function fetchRecords() {
+    try {
+        const currentId = currentUser ? currentUser.id : null;
+
+        const res = await fetch(`${API_URL}/records`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentUserId: currentId })
+        });
+
+        if (res.ok) {
+            records = await res.json();
+            const verifiedRecords = records.filter(r => r.status === 'verified');
+
+            applySort();
+            renderPodium(verifiedRecords);
+            renderTicker(verifiedRecords);
+        }
+    } catch (e) { console.error("Server offline?", e); }
+}
+
+async function toggleRespect(recordId, btnElement) {
+    if (!currentUser) { alert("Debes iniciar sesión para dar Respeto."); return; }
+
+    const icon = btnElement.querySelector('i');
+    const countSpan = btnElement.nextElementSibling;
+    let currentCount = parseInt(countSpan.textContent);
+    const isActive = btnElement.classList.contains('active');
+
+    if (isActive) {
+        btnElement.classList.remove('active');
+        countSpan.textContent = currentCount - 1;
+    } else {
+        btnElement.classList.add('active');
+        icon.classList.add('respect-anim');
+        setTimeout(() => icon.classList.remove('respect-anim'), 300);
+        countSpan.textContent = currentCount + 1;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/respect`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userEmail: currentUser.email, recordId })
+        });
+        fetchRecords();
+    } catch (err) { console.error(err); }
+}
+
 async function updateProfile(data) {
     const res = await fetch(`${API_URL}/profile/update`, { method: 'POST', body: data });
     return res.json();
-}
-async function fetchRecords() {
-    try {
-        const res = await fetch(`${API_URL}/records`);
-        if (res.ok) { records = await res.json(); applySort(); }
-    } catch (e) { console.error("Server offline?"); }
 }
 async function registerUser(data) {
     const res = await fetch(`${API_URL}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
@@ -334,7 +353,7 @@ async function uploadRecord(data) {
     return res.json();
 }
 
-// --- GLOBAL TABLE ---
+// --- GLOBAL TABLE (FIXED LAYOUT) ---
 function renderTable() {
     const tbody = document.getElementById('rankingBody');
     tbody.innerHTML = '';
@@ -351,23 +370,51 @@ function renderTable() {
             verifiedBadge = '<span class="pending-text">(Pendiente)</span>';
         }
 
-        let videoContent = (r.video && r.video.trim() !== '') ? `<a href="${r.video}" target="_blank" class="video-link"><i class="fas fa-play-circle fa-lg"></i></a>` : `<span style="color:#333">-</span>`;
+        let videoContent = (r.video && r.video.trim() !== '') ?
+            `<a href="${r.video}" target="_blank" class="video-btn-square"><i class="fas fa-play"></i></a>` :
+            `<span style="color:#333">-</span>`;
+
+        const activeClass = r.has_respected ? 'active' : '';
+        const respectCount = r.respect_count || 0;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="th-rank">${index + 1}</td>
             <td>
-                <!-- ESTILO CORREGIDO: Clase user-rank-name para la fuente Teko -->
-                <div class="user-rank-name hover-slide" onclick="loadProfile('${r.email}')">
-                    ${r.name} ${verifiedBadge}
+                <!-- FLEXBOX PARA NOMBRE + TICK (SOLUCIÓN TABLE FIX) -->
+                <div class="cell-flex-start" style="cursor:pointer" onclick="loadProfile('${r.email}')">
+                    <div class="user-rank-name hover-slide">
+                        ${r.name}
+                    </div>
+                    ${verifiedBadge}
                 </div>
             </td>
-            <td><img src="https://flagcdn.com/${r.country.toLowerCase()}.svg" class="flag-icon"> ${r.country}</td>
+            <td>
+                <div class="cell-flex-start">
+                    <img src="https://flagcdn.com/${r.country.toLowerCase()}.svg" class="flag-icon"> 
+                    <span style="font-weight:500">${r.country}</span>
+                </div>
+            </td>
             <td><span class="device-tag">${r.device}</span></td>
-            <td class="text-right"><span class="score-val">${parseFloat(r.score).toFixed(2)}</span><span class="unit-small">kg</span>${newPrBadge}</td>
+            <td>
+                <div class="cell-flex-end">
+                    <span class="score-val">${parseFloat(r.score).toFixed(2)}</span><span class="unit-small">kg</span>
+                    ${newPrBadge}
+                    <div class="respect-container">
+                        <button class="respect-btn ${activeClass}" onclick="toggleRespect(${r.id}, this)">
+                            <i class="fas fa-fist-raised"></i>
+                        </button>
+                        <span class="respect-count">${respectCount}</span>
+                    </div>
+                </div>
+            </td>
             <td class="text-right text-muted">${parseFloat(r.bw).toFixed(1)}<span class="unit-small">kg</span></td>
             <td class="text-right text-muted" style="font-size:0.9rem">${r.date}</td>
-            <td class="text-center">${videoContent}</td>
+            <td>
+                <div class="cell-flex-center">
+                    ${videoContent}
+                </div>
+            </td>
         `;
         tbody.appendChild(tr);
     });
@@ -451,7 +498,7 @@ function setupEventListeners() {
                 editProfileModal.classList.add('hidden');
                 loadProfile(currentUser.email);
             } else {
-                alert('Error actualizando perfil');
+                alert('Error actualizando perfil: ' + res.error);
             }
         } catch (err) { console.error(err); }
     };

@@ -23,7 +23,7 @@ db.serialize(() => {
         role TEXT DEFAULT 'user' 
     )`);
 
-    // 2. Records (Ranking Global - Solo la mejor marca actual)
+    // 2. Records
     db.run(`CREATE TABLE IF NOT EXISTS records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
@@ -40,7 +40,7 @@ db.serialize(() => {
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 
-    // 3. Historial (Todas las marcas, con su estado individual)
+    // 3. Historial
     db.run(`CREATE TABLE IF NOT EXISTS history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
@@ -52,6 +52,15 @@ db.serialize(() => {
         timestamp INTEGER,
         status TEXT DEFAULT 'pending', 
         FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+
+    // 4. Respetos (Likes)
+    db.run(`CREATE TABLE IF NOT EXISTS respects (
+        user_id INTEGER,
+        record_id INTEGER,
+        PRIMARY KEY (user_id, record_id),
+        FOREIGN KEY(user_id) REFERENCES users(id),
+        FOREIGN KEY(record_id) REFERENCES records(id)
     )`);
 });
 

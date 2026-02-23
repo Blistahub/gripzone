@@ -33,10 +33,8 @@
             <button id="loginBtn" class="btn btn-outline sweep-hover-btn" data-i18n="login">Iniciar Sesión</button>
 
             <div id="userInfo" class="user-info hidden">
-                <!-- Botón Admin (Solo visible para admins) -->
                 <button id="adminBtn" class="btn btn-icon hidden" style="color:#00f3ff; margin-right:15px"
                     title="Panel Juez"><i class="fas fa-gavel fa-lg"></i></button>
-
                 <span id="userNameDisplay" class="nav-user-link hover-slide">Usuario</span>
                 <button id="logoutBtn" class="btn-icon"><i class="fas fa-sign-out-alt"></i></button>
                 <button id="uploadBtn" class="btn btn-primary sweep-hover-btn" data-i18n="upload">Nueva Marca</button>
@@ -44,12 +42,23 @@
         </div>
     </nav>
 
+    <!-- IRON TICKER -->
+    <div class="ticker-wrap">
+        <div class="ticker" id="liveTicker">
+            <div class="ticker-item">LOADING GRIPZONE SYSTEM DATA...</div>
+        </div>
+    </div>
+
     <!-- RANKING GLOBAL -->
     <section id="global-ranking-view">
         <header class="hero">
             <div class="hero-content">
                 <h1 data-i18n="hero_title">GRIP<span class="highlight">ZONE</span> RANKING</h1>
-                <p data-i18n="hero_subtitle">BASE DE DATOS MUNDIAL DE FUERZA DE MANO</p>
+                <p data-i18n="hero_subtitle" style="margin-bottom: 40px;">BASE DE DATOS MUNDIAL DE FUERZA DE MANO</p>
+
+                <div id="podium-container" class="podium-container">
+                    <div style="color:#444">Cargando Campeones...</div>
+                </div>
             </div>
         </header>
         <section class="controls">
@@ -69,14 +78,15 @@
             <table class="ranking-table">
                 <thead>
                     <tr>
-                        <th class="th-rank">#</th>
-                        <th data-i18n="th_athlete">Atleta</th>
-                        <th data-i18n="th_country">País</th>
-                        <th data-i18n="th_device">Dispositivo</th>
-                        <th data-i18n="th_score" class="text-right">Marca</th>
-                        <th data-i18n="th_bw" class="text-right">Peso</th>
-                        <th data-i18n="th_date" class="text-right">Fecha</th>
-                        <th data-i18n="th_video" class="text-center">Video</th>
+                        <!-- CLASES DE ANCHO FIJO AÑADIDAS -->
+                        <th class="th-rank col-rank">#</th>
+                        <th class="col-athlete" data-i18n="th_athlete">Atleta</th>
+                        <th class="col-country" data-i18n="th_country">País</th>
+                        <th class="col-device" data-i18n="th_device">Dispositivo</th>
+                        <th class="text-right col-score" data-i18n="th_score">Marca</th>
+                        <th class="text-right col-bw" data-i18n="th_bw">Peso</th>
+                        <th class="text-right col-date" data-i18n="th_date">Fecha</th>
+                        <th class="text-center col-video" data-i18n="th_video">Video</th>
                     </tr>
                 </thead>
                 <tbody id="rankingBody"></tbody>
@@ -152,7 +162,7 @@
         </div>
     </section>
 
-    <!-- ADMIN PANEL (NUEVO) -->
+    <!-- ADMIN PANEL -->
     <section id="admin-view" class="hidden">
         <div class="profile-container">
             <h1 class="modal-title" style="text-align:left; border-bottom:1px solid #333; padding-bottom:10px;">
@@ -202,9 +212,9 @@
                     <option value="Baseline">Baseline</option>
                 </select>
                 <label data-i18n="lbl_score">Marca (KG)</label>
-                <input type="number" id="upScore" step="0.01" required>
+                <input type="number" id="upScore" step="0.01" min="0" required>
                 <label data-i18n="lbl_bw">Peso Corporal (KG)</label>
-                <input type="number" id="upBw" step="0.1" required>
+                <input type="number" id="upBw" step="0.1" min="0" required>
                 <label data-i18n="lbl_video">YouTube Link</label>
                 <input type="url" id="upVideo" data-i18n-ph="ph_video" placeholder="https://...">
                 <button type="submit" class="btn btn-primary full-width sweep-hover-btn"
@@ -222,7 +232,7 @@
                 <input type="file" id="editAvatar" accept="image/*"
                     style="padding:5px; border:1px solid #333; width:100%; margin-bottom:15px; background:#111">
                 <label data-i18n="lbl_edit_bw">Peso Corporal (KG)</label>
-                <input type="number" id="editBwInput" step="0.1" required>
+                <input type="number" id="editBwInput" step="0.1" min="0" required>
                 <label data-i18n="lbl_edit_bio">Descripción / Bio</label>
                 <input type="text" id="editBio" data-i18n-ph="ph_bio" placeholder="Armwrestler, Climber...">
                 <label>Instagram Link</label>
