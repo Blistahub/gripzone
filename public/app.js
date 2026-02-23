@@ -95,7 +95,7 @@ async function loadProfile(email) {
         if (!res.ok) throw new Error('Error en servidor');
         const data = await res.json();
 
-        // SEGURIDAD
+        // SEGURIDAD: Si no hay marcas verificadas, usamos 0 para evitar errores visuales
         const safeBW = data.bw || 0;
         const safeBestScore = data.bestScore || 0;
 
@@ -103,9 +103,9 @@ async function loadProfile(email) {
         document.getElementById('profile-name').textContent = data.name;
         document.getElementById('profile-country').innerHTML = `<img src="https://flagcdn.com/${data.country.toLowerCase()}.svg" class="flag-icon"> ${data.country}`;
         document.getElementById('profile-bio').textContent = data.bio;
-        document.getElementById('profile-best').textContent = safeBestScore.toFixed(2);
+        document.getElementById('profile-best').textContent = safeBestScore > 0 ? safeBestScore.toFixed(2) : "0.0";
         document.getElementById('profile-rank-badge').textContent = data.globalRank === '-' ? '-' : '#' + data.globalRank;
-        document.getElementById('profile-bw-display').textContent = safeBW.toFixed(1);
+        document.getElementById('profile-bw-display').textContent = safeBW > 0 ? safeBW.toFixed(1) : "-";
 
         const avatarImg = document.getElementById('profile-avatar');
         avatarImg.src = data.avatar ? data.avatar : 'https://via.placeholder.com/300x400/111/444?text=NO+IMAGE';
@@ -144,7 +144,7 @@ async function loadProfile(email) {
     }
 }
 
-// --- BADGES ---
+// --- RENDER BADGES ---
 function renderBadges(bestScore, bw, history) {
     const container = document.getElementById('badges-container');
     container.innerHTML = '';
@@ -152,42 +152,42 @@ function renderBadges(bestScore, bw, history) {
 
     // 1. FUERZA ABSOLUTA
     if (bestScore > 0) {
-        if (bestScore >= 120) { badges.push({ icon: 'fa-khanda', text: '120KG+ HYDRAULIC', class: 'mythic' }); }
-        else if (bestScore >= 110) { badges.push({ icon: 'fa-dumbbell', text: '110KG TITAN', class: 'mythic' }); }
-        else if (bestScore >= 100) { badges.push({ icon: 'fa-certificate', text: '100KG CENTURY CLUB', class: 'diamond' }); }
-        else if (bestScore >= 90) { badges.push({ icon: 'fa-dragon', text: '90KG BEAST', class: 'diamond' }); }
-        else if (bestScore >= 80) { badges.push({ icon: 'fa-fist-raised', text: '80KG VICE GRIP', class: 'gold' }); }
-        else if (bestScore >= 70) { badges.push({ icon: 'fa-hand-rock', text: '70KG IRON HAND', class: 'gold' }); }
-        else if (bestScore >= 60) { badges.push({ icon: 'fa-lock', text: '60KG LOCKED', class: 'silver' }); }
-        else if (bestScore >= 50) { badges.push({ icon: 'fa-user', text: '50KG AVERAGE JOE', class: 'bronze' }); }
-        else if (bestScore >= 40) { badges.push({ icon: 'fa-seedling', text: '40KG ROOKIE', class: 'bronze' }); }
-        else { badges.push({ icon: 'fa-baby', text: 'BABY GRIP', class: 'trash' }); }
+        if (bestScore >= 120) badges.push({ icon: 'fa-khanda', text: '120KG+ HYDRAULIC', class: 'mythic' });
+        else if (bestScore >= 110) badges.push({ icon: 'fa-dumbbell', text: '110KG TITAN', class: 'mythic' });
+        else if (bestScore >= 100) badges.push({ icon: 'fa-certificate', text: '100KG CENTURY CLUB', class: 'diamond' });
+        else if (bestScore >= 90) badges.push({ icon: 'fa-dragon', text: '90KG BEAST', class: 'diamond' });
+        else if (bestScore >= 80) badges.push({ icon: 'fa-fist-raised', text: '80KG VICE GRIP', class: 'gold' });
+        else if (bestScore >= 70) badges.push({ icon: 'fa-hand-rock', text: '70KG IRON HAND', class: 'gold' });
+        else if (bestScore >= 60) badges.push({ icon: 'fa-lock', text: '60KG LOCKED', class: 'silver' });
+        else if (bestScore >= 50) badges.push({ icon: 'fa-user', text: '50KG AVERAGE JOE', class: 'bronze' });
+        else if (bestScore >= 40) badges.push({ icon: 'fa-seedling', text: '40KG ROOKIE', class: 'bronze' });
+        else badges.push({ icon: 'fa-baby', text: 'BABY GRIP', class: 'trash' });
     }
 
     // 2. FUERZA RELATIVA
     if (bw > 0 && bestScore > 0) {
         const ratio = bestScore / bw;
-        if (ratio >= 2.0) { badges.push({ icon: 'fa-spider', text: 'THE SPIDER (2.0x)', class: 'mythic' }); }
-        else if (ratio >= 1.9) { badges.push({ icon: 'fa-dragon', text: 'THE T-REX (1.9x)', class: 'mythic' }); }
-        else if (ratio >= 1.8) { badges.push({ icon: 'fa-pastafarianism', text: 'THE CRAB (1.8x)', class: 'diamond' }); }
-        else if (ratio >= 1.7) { badges.push({ icon: 'fa-dumbbell', text: 'THE GORILLA (1.7x)', class: 'diamond' }); }
-        else if (ratio >= 1.6) { badges.push({ icon: 'fa-feather-alt', text: 'THE EAGLE (1.6x)', class: 'gold' }); }
-        else if (ratio >= 1.5) { badges.push({ icon: 'fa-bug', text: 'THE ANT (1.5x)', class: 'gold' }); }
-        else if (ratio >= 1.4) { badges.push({ icon: 'fa-monument', text: 'THE CHIMP (1.4x)', class: 'gold' }); }
-        else if (ratio >= 1.3) { badges.push({ icon: 'fa-staff-snake', text: 'THE PYTHON (1.3x)', class: 'silver' }); }
-        else if (ratio >= 1.2) { badges.push({ icon: 'fa-cat', text: 'THE LEOPARD (1.2x)', class: 'silver' }); }
-        else if (ratio >= 1.1) { badges.push({ icon: 'fa-dog', text: 'THE BULLDOG (1.1x)', class: 'silver' }); }
-        else if (ratio >= 1.0) { badges.push({ icon: 'fa-wolf-pack-battalion', text: 'THE WOLF (1.0x)', class: 'bronze' }); }
-        else if (ratio >= 0.9) { badges.push({ icon: 'fa-cat', text: 'THE CAT (0.9x)', class: 'bronze' }); }
-        else if (ratio >= 0.8) { badges.push({ icon: 'fa-tree', text: 'THE SQUIRREL (0.8x)', class: 'bronze' }); }
-        else if (ratio >= 0.7) { badges.push({ icon: 'fa-leaf', text: 'THE KOALA (0.7x)', class: 'trash' }); }
-        else if (ratio >= 0.6) { badges.push({ icon: 'fa-bed', text: 'THE SLOTH (0.6x)', class: 'trash' }); }
-        else { badges.push({ icon: 'fa-water', text: 'JELLYFISH (<0.6x)', class: 'trash' }); }
+        if (ratio >= 2.0) badges.push({ icon: 'fa-spider', text: 'THE SPIDER (2.0x)', class: 'mythic' });
+        else if (ratio >= 1.9) badges.push({ icon: 'fa-dragon', text: 'THE T-REX (1.9x)', class: 'mythic' });
+        else if (ratio >= 1.8) badges.push({ icon: 'fa-pastafarianism', text: 'THE CRAB (1.8x)', class: 'diamond' });
+        else if (ratio >= 1.7) badges.push({ icon: 'fa-dumbbell', text: 'THE GORILLA (1.7x)', class: 'diamond' });
+        else if (ratio >= 1.6) badges.push({ icon: 'fa-feather-alt', text: 'THE EAGLE (1.6x)', class: 'gold' });
+        else if (ratio >= 1.5) badges.push({ icon: 'fa-bug', text: 'THE ANT (1.5x)', class: 'gold' });
+        else if (ratio >= 1.4) badges.push({ icon: 'fa-monument', text: 'THE CHIMP (1.4x)', class: 'gold' });
+        else if (ratio >= 1.3) badges.push({ icon: 'fa-staff-snake', text: 'THE PYTHON (1.3x)', class: 'silver' });
+        else if (ratio >= 1.2) badges.push({ icon: 'fa-cat', text: 'THE LEOPARD (1.2x)', class: 'silver' });
+        else if (ratio >= 1.1) badges.push({ icon: 'fa-dog', text: 'THE BULLDOG (1.1x)', class: 'silver' });
+        else if (ratio >= 1.0) badges.push({ icon: 'fa-wolf-pack-battalion', text: 'THE WOLF (1.0x)', class: 'bronze' });
+        else if (ratio >= 0.9) badges.push({ icon: 'fa-cat', text: 'THE CAT (0.9x)', class: 'bronze' });
+        else if (ratio >= 0.8) badges.push({ icon: 'fa-tree', text: 'THE SQUIRREL (0.8x)', class: 'bronze' });
+        else if (ratio >= 0.7) badges.push({ icon: 'fa-leaf', text: 'THE KOALA (0.7x)', class: 'trash' });
+        else if (ratio >= 0.6) badges.push({ icon: 'fa-bed', text: 'THE SLOTH (0.6x)', class: 'trash' });
+        else badges.push({ icon: 'fa-water', text: 'JELLYFISH (<0.6x)', class: 'trash' });
     }
 
-    if (history.length > 0) { badges.push({ icon: 'fa-flag-checkered', text: 'DEBUT', class: 'silver' }); }
-    if (history.length >= 10) { badges.push({ icon: 'fa-medal', text: 'VETERAN', class: 'gold' }); }
-    else if (history.length >= 5) { badges.push({ icon: 'fa-star', text: 'CONSISTENT', class: 'bronze' }); }
+    if (history.length > 0) badges.push({ icon: 'fa-flag-checkered', text: 'DEBUT', class: 'silver' });
+    if (history.length >= 10) badges.push({ icon: 'fa-medal', text: 'VETERAN', class: 'gold' });
+    else if (history.length >= 5) badges.push({ icon: 'fa-star', text: 'CONSISTENT', class: 'bronze' });
 
     badges.forEach(b => {
         const div = document.createElement('div');
@@ -198,15 +198,18 @@ function renderBadges(bestScore, bw, history) {
     });
 }
 
-// --- CHART ---
+// --- RENDER CHART ---
 function renderChart(history) {
     const ctx = document.getElementById('progressChart').getContext('2d');
+
+    // Ordenar cronológicamente usando timestamp si existe
     const chartData = [...history].sort((a, b) => {
         if (a.timestamp && b.timestamp) return a.timestamp - b.timestamp;
         return new Date(a.date) - new Date(b.date);
     });
 
     if (chartData.length === 0) chartData.push({ date: 'Start', score: 0 });
+
     const labels = chartData.map(d => d.date);
     const dataPoints = chartData.map(d => d.score);
 
@@ -236,7 +239,7 @@ function renderChart(history) {
             plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.9)', titleColor: '#F4C430', bodyColor: '#fff', borderColor: '#333', borderWidth: 1 } },
             scales: {
                 x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' }, beginAtZero: false }
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' }, beginAtZero: true, min: 0 }
             }
         }
     });
@@ -354,7 +357,10 @@ function renderTable() {
         tr.innerHTML = `
             <td class="th-rank">${index + 1}</td>
             <td>
-                <div class="profile-link hover-slide" onclick="loadProfile('${r.email}')">${r.name} ${verifiedBadge}</div>
+                <!-- ESTILO CORREGIDO: Clase user-rank-name para la fuente Teko -->
+                <div class="user-rank-name hover-slide" onclick="loadProfile('${r.email}')">
+                    ${r.name} ${verifiedBadge}
+                </div>
             </td>
             <td><img src="https://flagcdn.com/${r.country.toLowerCase()}.svg" class="flag-icon"> ${r.country}</td>
             <td><span class="device-tag">${r.device}</span></td>
@@ -420,12 +426,19 @@ function setupEventListeners() {
     // EDIT PROFILE SUBMIT
     document.getElementById('edit-profile-form').onsubmit = async (e) => {
         e.preventDefault();
+
+        const bwInput = document.getElementById('editBwInput').value;
+        if (parseFloat(bwInput) < 0) {
+            alert("No se permiten valores negativos");
+            return;
+        }
+
         const formData = new FormData();
         formData.append('email', currentUser.email);
         formData.append('bio', document.getElementById('editBio').value);
         formData.append('instagram', document.getElementById('editInsta').value);
         formData.append('youtube', document.getElementById('editYt').value);
-        formData.append('bw', document.getElementById('editBwInput').value);
+        formData.append('bw', bwInput);
 
         const fileInput = document.getElementById('editAvatar');
         if (fileInput.files.length > 0) {
@@ -457,9 +470,17 @@ function setupEventListeners() {
     };
     document.getElementById('upload-form').onsubmit = async (e) => {
         e.preventDefault();
-        const res = await uploadRecord({ device: document.getElementById('upDevice').value, score: document.getElementById('upScore').value, bw: document.getElementById('upBw').value, video: document.getElementById('upVideo').value });
+        const score = document.getElementById('upScore').value;
+        const bw = document.getElementById('upBw').value;
+
+        if (parseFloat(score) < 0 || parseFloat(bw) < 0) {
+            alert("No se permiten valores negativos");
+            return;
+        }
+
+        const res = await uploadRecord({ device: document.getElementById('upDevice').value, score: score, bw: bw, video: document.getElementById('upVideo').value });
         if (res.success) { uploadModal.classList.add('hidden'); fetchRecords(); alert('Marca subida (Pendiente de Verificación)!'); if (currentProfileEmail === currentUser.email) loadProfile(currentUser.email); }
-        else alert('Error');
+        else alert('Error: ' + res.error);
     };
     document.getElementById('logoutBtn').onclick = () => { currentUser = null; localStorage.removeItem('gripzone_user'); updateAuthUI(); goHome(); };
 }
@@ -470,7 +491,6 @@ function updateAuthUI() {
         document.getElementById('userInfo').classList.remove('hidden');
         document.getElementById('userNameDisplay').textContent = currentUser.name;
 
-        // MOSTRAR BOTÓN ADMIN
         if (currentUser.role === 'admin') {
             document.getElementById('adminBtn').classList.remove('hidden');
             document.getElementById('adminBtn').onclick = loadAdminPanel;
